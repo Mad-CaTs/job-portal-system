@@ -1,0 +1,38 @@
+# === JAVA ===
+*.class
+*.jar
+*.war
+*.log
+
+# === Maven ===
+target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+# === IntelliJ IDEA ===
+.idea/
+*.iml
+*.iws
+out/
+
+# === VS Code ===
+.vscode/
+
+# === Environment ===
+.env
+
+# === OS files ===
+.DS_Store
+Thumbs.db
+
+# === Logs and temp ===
+*.log
+logs/
+*.tmp
+*.swp
+
+# === Spring Boot ===
+spring.log
+
+# === Others ===
+node_modules/
