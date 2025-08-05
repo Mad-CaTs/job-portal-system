@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=AuthDB
+    url: jdbc:sqlserver://localhost:1433;databaseName=DB_AuthService
     username: ${DB_USER}
     password: ${DB_PASSWORD}
   jpa:
