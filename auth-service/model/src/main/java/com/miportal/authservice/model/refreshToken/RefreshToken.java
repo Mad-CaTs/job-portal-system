@@ -1,7 +1,11 @@
-package com.miportal.auth_service.domain.model;
+package com.miportal.authservice.model.refreshToken;
+
+import com.miportal.authservice.model.BaseEntity;
+import com.miportal.authservice.model.usuario.Usuario;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -9,15 +13,12 @@ import java.time.LocalDateTime;
 @Table(name = "TBL_REFRESH_TOKEN")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class RefreshToken extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "int_id")
-    private Long id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "int_id_fk_usuario", nullable = false)
