@@ -1,7 +1,7 @@
-package com.miportal.authservice.model.usuario;
+package com.miportal.authservice.model.entity.usuario;
 
-import com.miportal.authservice.model.BaseEntity;
-import com.miportal.authservice.model.rol.Rol;
+import com.miportal.authservice.model.entity.BaseEntity;
+import com.miportal.authservice.model.entity.rol.Rol;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

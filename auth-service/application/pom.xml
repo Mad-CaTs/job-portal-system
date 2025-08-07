@@ -10,7 +10,8 @@
     </parent>
 
     <artifactId>application</artifactId>
-
+    <packaging>jar</packaging>
+    
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -18,6 +19,11 @@
     </properties>
 
     <dependencies>
-
+        <!-- Dependencia al módulo model -->
+        <dependency>
+            <groupId>com.miportal.authservice</groupId>
+            <artifactId>model</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 </project>

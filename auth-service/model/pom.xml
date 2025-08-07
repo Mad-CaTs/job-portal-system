@@ -10,7 +10,6 @@
     </parent>
 
     <artifactId>model</artifactId>
-
     <packaging>jar</packaging>
 
     <properties>
