@@ -1,4 +1,4 @@
-package com.miportal.authservice.model.dto.usuario;
+package com.miportal.authservice.application.dto.usuario;
 
 public class UsuarioCreateRequest {
     private String username;

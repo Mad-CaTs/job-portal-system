@@ -1,10 +1,9 @@
-package com.miportal.authservice.model.dto.rol;
+package com.miportal.authservice.application.dto.rol;
 
 import java.util.List;
-import java.util.UUID;
 
 public class RolDTO {
-    private UUID id;
+    private Long id;
     private String nombre;
     private List<String> permisos;
 }

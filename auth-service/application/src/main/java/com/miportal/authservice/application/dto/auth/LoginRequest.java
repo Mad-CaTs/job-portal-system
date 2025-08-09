@@ -1,4 +1,4 @@
-package com.miportal.authservice.model.dto.auth;
+package com.miportal.authservice.application.dto.auth;
 
 public class LoginRequest {
     private String username;

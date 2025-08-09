@@ -1,4 +1,4 @@
-package com.miportal.authservice.model.entity;
+package com.miportal.authservice.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;

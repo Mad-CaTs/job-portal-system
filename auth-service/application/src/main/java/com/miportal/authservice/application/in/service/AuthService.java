@@ -1,0 +1,12 @@
+package com.miportal.authservice.application.in.service;
+
+import com.miportal.authservice.application.dto.auth.AuthResponse;
+import com.miportal.authservice.application.dto.auth.LoginRequest;
+import com.miportal.authservice.application.dto.auth.LoginResponse;
+import com.miportal.authservice.application.dto.auth.RefreshTokenRequest;
+
+public interface AuthService {
+    LoginResponse login(LoginRequest request);
+    AuthResponse refreshToken(RefreshTokenRequest request);
+    void logout(String refreshToken);
+}

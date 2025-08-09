@@ -1,4 +1,4 @@
-package com.miportal.authservice.model.entity.usuario;
+package com.miportal.authservice.model.usuario;
 
 public enum TipoUsuario {
     POSTULANTE,
