@@ -4,7 +4,7 @@ use DB_AuthService
 create table TBL_USUARIO
 (
 int_id INT IDENTITY(1,1) PRIMARY KEY,
-vch_username VARCHAR(100) NOT NULL, 
+vch_username VARCHAR(100) NOT NULL UNIQUE, 
 vch_email VARCHAR(150) NOT NULL UNIQUE,
 vch_password VARCHAR(255) NOT NULL,
 vch_tipo_usuario VARCHAR(50) NOT NULL,
