@@ -8,12 +8,12 @@ import com.miportal.authservice.application.in.service.UsuarioService;
 import com.miportal.authservice.application.mapper.UsuarioMapper;
 import com.miportal.authservice.application.out.repository.RolRepository;
 import com.miportal.authservice.application.out.repository.UsuarioRepository;
-import com.miportal.authservice.exception.ConflictException;
+import com.miportal.authservice.application.exception.ConflictException;
 import com.miportal.authservice.model.rol.Rol;
 import com.miportal.authservice.model.usuario.Usuario;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
@@ -88,7 +88,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public UsuarioDTO obtenerUsuarioPorId(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con id" + id));
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado con id" + id));
         return mapper.toDTO(usuario);
     }
 
@@ -101,7 +101,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Transactional
     public void eliminarUsuario(Long id) {
         if(!usuarioRepository.existById(id)){
-            throw new EntityNotFoundException("Usuario no encontrado con id" + id);
+            throw new NotFoundException("Usuario no encontrado con id" + id);
         }
         usuarioRepository.deleteById(id);
     }
