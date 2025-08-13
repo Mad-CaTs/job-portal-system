@@ -13,7 +13,7 @@
 	<modules>
 		<module>application</module>
 		<module>adapter</module>
-		<module>model</module>
+		<module>domain</module>
 		<module>config</module>
 	</modules>
 

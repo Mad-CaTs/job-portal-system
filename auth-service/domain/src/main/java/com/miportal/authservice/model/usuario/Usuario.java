@@ -17,9 +17,9 @@ public class Usuario extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "int_id")
-    private Integer id;
+    private Long id;
 
-    @Column(name = "vch_username", nullable = false, length = 100)
+    @Column(name = "vch_username", nullable = false, unique = true, length = 100)
     private String username;
 
     @Column(name = "vch_email", nullable = false, unique = true, length = 150)
@@ -35,11 +35,7 @@ public class Usuario extends BaseEntity {
     @Column(name = "bit_estado")
     private Boolean estado = true;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "TBL_USUARIO_ROL",
-            joinColumns = @JoinColumn(name = "int_id_fk_usuario"),
-            inverseJoinColumns = @JoinColumn(name = "int_id_fk_rol")
-    )
-    private Set<Rol> roles;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "int_id_fk_rol", nullable = false)
+    private Rol roles;
 }

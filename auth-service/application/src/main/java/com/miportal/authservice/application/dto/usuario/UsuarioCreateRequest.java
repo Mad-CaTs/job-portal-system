@@ -16,7 +16,7 @@ public class UsuarioCreateRequest {
     private String email;
 
     @NotBlank(message = "La contraseña es obligatoria")
-    @Size(min = 6, max = 50, message = "La contraseña debe tener entre 6 y 50 caracteres")
+    @Size(min = 8, max = 50, message = "La contraseña debe tener entre 6 y 50 caracteres")
     private String password;
 
     @NotBlank(message = "El rol es obligatorio")

@@ -23,7 +23,7 @@
         <!-- Dependencia al módulo model -->
         <dependency>
             <groupId>com.miportal.authservice</groupId>
-            <artifactId>model</artifactId>
+            <artifactId>domain</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

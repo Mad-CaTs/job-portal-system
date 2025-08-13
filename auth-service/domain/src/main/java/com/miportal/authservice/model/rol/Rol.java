@@ -14,7 +14,7 @@ public class Rol extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "int_id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "vch_nombre", nullable = false, unique = true, length = 50)
     private String nombre;
