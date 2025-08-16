@@ -1,59 +1,49 @@
-Create Database DB_AuthService
-use DB_AuthService
+CREATE DATABASE DB_AuthService;
+USE DB_AuthService;
 
-create table TBL_USUARIO
-(
-int_id INT IDENTITY(1,1) PRIMARY KEY,
-vch_username VARCHAR(100) NOT NULL UNIQUE, 
-vch_email VARCHAR(150) NOT NULL UNIQUE,
-vch_password VARCHAR(255) NOT NULL,
-vch_tipo_usuario VARCHAR(50) NOT NULL,
-bit_estado BIT DEFAULT 1,
+CREATE TABLE TBL_USUARIO (
+    int_id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    vch_username VARCHAR(100) NOT NULL UNIQUE,
+    vch_email VARCHAR(150) NOT NULL UNIQUE,
+    vch_password VARCHAR(255) NOT NULL,
+    bit_estado BIT DEFAULT 1,
 
-vch_usuario_creacion VARCHAR(100) NOT NULL,
-dt_fec_creacion DATETIME NOT NULL DEFAULT GETDATE(),
-vch_usuario_modificacion VARCHAR(100),
-dt_fec_modificacion DATETIME,
-)
-GO
+    int_id_fk_rol BIGINT NOT NULL,
+    CONSTRAINT FK_USUARIO_ROL FOREIGN KEY (int_id_fk_rol) REFERENCES TBL_ROL(int_id),
 
-create table TBL_ROL
-(
-int_id INT IDENTITY(1,1) PRIMARY KEY,
-vch_nombre VARCHAR(50) NOT NULL UNIQUE,
-bit_estado BIT DEFAULT 1,
-
-vch_usuario_creacion VARCHAR(100) NOT NULL,
-dt_fec_creacion DATETIME NOT NULL DEFAULT GETDATE(),
-vch_usuario_modificacion VARCHAR(100),
-dt_fec_modificacion DATETIME,
-)
-GO
-
-create table TBL_USUARIO_ROL
-(
-int_id_fk_usuario INT NOT NULL,
-int_id_fk_rol INT NOT NULL,
-
-FOREIGN KEY(int_id_fk_usuario) REFERENCES TBL_USUARIO(int_id),
-FOREIGN KEY(int_id_fk_rol) REFERENCES TBL_ROL(int_id),
-
-PRIMARY KEY (int_id_fk_usuario, int_id_fk_rol)
-)
-GO
-
-create table TBL_REFRESH_TOKEN
-(
-int_id INT IDENTITY(1,1) PRIMARY KEY,
-int_id_fk_usuario INT NOT NULL,
-vch_token VARCHAR(500) NOT NULL,
-dt_expiracion DATETIME NOT NULL,
-
-FOREIGN KEY (int_id_fk_usuario) REFERENCES TBL_USUARIO(int_id),
-
-vch_usuario_creacion VARCHAR(100) NOT NULL,
-dt_fec_creacion DATETIME NOT NULL DEFAULT GETDATE(),
-)
-GO
+    vch_usuario_creacion VARCHAR(100) NOT NULL,
+    dt_fec_creacion DATETIME NOT NULL DEFAULT GETDATE(),
+    vch_usuario_modificacion VARCHAR(100),
+    dt_fec_modificacion DATETIME
+);
 
 
+CREATE TABLE TBL_ROL (
+    int_id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    vch_nombre VARCHAR(50) NOT NULL UNIQUE,
+    bit_estado BIT DEFAULT 1,
+
+    vch_usuario_creacion VARCHAR(100) NOT NULL,
+    dt_fec_creacion DATETIME NOT NULL DEFAULT GETDATE(),
+    vch_usuario_modificacion VARCHAR(100),
+    dt_fec_modificacion DATETIME
+);
+
+-- Insertar roles fijos
+INSERT INTO TBL_ROL (vch_nombre, vch_usuario_creacion)
+VALUES 
+('POSTULANTE', 'system'),
+('EMPRESA', 'system'),
+('ADMIN', 'system');
+
+
+CREATE TABLE TBL_REFRESH_TOKEN (
+    int_id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    int_id_fk_usuario BIGINT NOT NULL,
+    CONSTRAINT FK_REFRESH_USUARIO FOREIGN KEY (int_id_fk_usuario) REFERENCES TBL_USUARIO(int_id),
+    vch_token VARCHAR(500) NOT NULL,
+    dt_expiracion DATETIME NOT NULL,
+
+    vch_usuario_creacion VARCHAR(100) NOT NULL,
+    dt_fec_creacion DATETIME NOT NULL DEFAULT GETDATE()
+);

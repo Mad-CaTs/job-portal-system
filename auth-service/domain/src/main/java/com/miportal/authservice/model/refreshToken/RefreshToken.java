@@ -4,15 +4,18 @@ import com.miportal.authservice.model.BaseEntity;
 import com.miportal.authservice.model.usuario.Usuario;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "TBL_REFRESH_TOKEN")
 @Getter
 @Setter
+@SuperBuilder
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "TBL_REFRESH_TOKEN")
 public class RefreshToken extends BaseEntity {
 
     @Id

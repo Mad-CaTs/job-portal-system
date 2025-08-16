@@ -1,19 +1,21 @@
-package com.miportal.authservice.application.mapper;
+package com.miportal.authservice.application.dto.mapper;
 
 import com.miportal.authservice.application.dto.usuario.UsuarioCreateRequest;
 import com.miportal.authservice.application.dto.usuario.UsuarioDTO;
 import com.miportal.authservice.model.usuario.Usuario;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
-import java.util.List;
+import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface UsuarioMapper {
+    @Mapping(source = "rol.nombre", target = "rol")
     UsuarioDTO toDTO(Usuario usuario);
-    List<UsuarioDTO> toDTOList(List<Usuario> usuarios);
 
-    @Mapping(target = "id", ignore = true) //Ignorar id porque la bd lo autogenera
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "estado", constant = "true")
+    @Mapping(target = "usuarioCreacion", constant = "system")
+    @Mapping(target = "rol", ignore = true)
+    @Mapping(target = "password", ignore = true)
     Usuario toEntity(UsuarioCreateRequest request);
 }

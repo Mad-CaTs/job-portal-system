@@ -1,4 +1,4 @@
-package com.miportal.authservice.application.in.service;
+package com.miportal.authservice.application.in;
 
 import com.miportal.authservice.application.dto.auth.AuthResponse;
 import com.miportal.authservice.application.dto.auth.LoginRequest;
