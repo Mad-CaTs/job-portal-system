@@ -29,6 +29,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordHasher passwordHasher;
     private final TokenProvider tokenProvider;
     private final AuthMapper authMapper;
+    private final JwtConfig jwtConfig;
 
     @Override
     public LoginResponse login(LoginRequest request) {
@@ -83,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
         String newAccessToken =  tokenProvider.generateAccessToken(
                 usuario.getEmail(),
                 claims,
-                3600000 // 1Hr
+
         );
 
         return authMapper.toAuthResponse(newAccessToken, request.getRefreshToken());
