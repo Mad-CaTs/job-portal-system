@@ -6,12 +6,12 @@ import com.miportal.authservice.application.dto.usuario.UsuarioDTO;
 import com.miportal.authservice.application.dto.usuario.UsuarioUpdateRequest;
 import com.miportal.authservice.application.exception.ConflictException;
 import com.miportal.authservice.application.exception.NotFoundException;
-import com.miportal.authservice.application.in.UsuarioService;
-import com.miportal.authservice.application.out.repository.RolRepository;
-import com.miportal.authservice.application.out.repository.UsuarioRepository;
-import com.miportal.authservice.model.rol.Rol;
-import com.miportal.authservice.model.usuario.Usuario;
-import com.miportal.authservice.service.PasswordHasher;
+import com.miportal.authservice.application.port.in.UsuarioService;
+import com.miportal.authservice.application.port.out.RolRepository;
+import com.miportal.authservice.application.port.out.UsuarioRepository;
+import com.miportal.authservice.domain.model.rol.Rol;
+import com.miportal.authservice.domain.model.usuario.Usuario;
+import com.miportal.authservice.domain.service.PasswordHasher;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

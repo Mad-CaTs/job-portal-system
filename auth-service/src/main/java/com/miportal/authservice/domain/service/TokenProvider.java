@@ -1,4 +1,4 @@
-package com.miportal.authservice.service;
+package com.miportal.authservice.domain.service;
 
 import java.util.Map;
 

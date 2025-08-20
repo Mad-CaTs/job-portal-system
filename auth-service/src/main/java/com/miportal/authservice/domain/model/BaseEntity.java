@@ -1,4 +1,4 @@
-package com.miportal.authservice.model;
+package com.miportal.authservice.domain.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.miportal.authservice.application.in;
+package com.miportal.authservice.application.port.in;
 
 import com.miportal.authservice.application.dto.usuario.UsuarioCreateRequest;
 import com.miportal.authservice.application.dto.usuario.UsuarioDTO;

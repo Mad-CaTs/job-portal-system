@@ -2,7 +2,7 @@ package com.miportal.authservice.application.dto.mapper;
 
 import com.miportal.authservice.application.dto.auth.AuthResponse;
 import com.miportal.authservice.application.dto.auth.LoginResponse;
-import com.miportal.authservice.model.usuario.Usuario;
+import com.miportal.authservice.domain.model.usuario.Usuario;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

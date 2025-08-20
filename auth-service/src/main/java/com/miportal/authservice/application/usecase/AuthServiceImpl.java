@@ -5,14 +5,16 @@ import com.miportal.authservice.application.dto.auth.LoginRequest;
 import com.miportal.authservice.application.dto.auth.LoginResponse;
 import com.miportal.authservice.application.dto.auth.RefreshTokenRequest;
 import com.miportal.authservice.application.dto.mapper.AuthMapper;
+import com.miportal.authservice.application.exception.NotFoundException;
 import com.miportal.authservice.application.exception.UnauthorizedException;
-import com.miportal.authservice.application.in.AuthService;
-import com.miportal.authservice.application.out.repository.RefreshTokenRepository;
-import com.miportal.authservice.application.out.repository.UsuarioRepository;
-import com.miportal.authservice.model.refreshToken.RefreshToken;
-import com.miportal.authservice.model.usuario.Usuario;
-import com.miportal.authservice.service.PasswordHasher;
-import com.miportal.authservice.service.TokenProvider;
+import com.miportal.authservice.application.port.in.AuthService;
+import com.miportal.authservice.application.port.out.RefreshTokenRepository;
+import com.miportal.authservice.application.port.out.UsuarioRepository;
+import com.miportal.authservice.config.JwtConfig;
+import com.miportal.authservice.domain.model.refreshToken.RefreshToken;
+import com.miportal.authservice.domain.model.usuario.Usuario;
+import com.miportal.authservice.domain.service.PasswordHasher;
+import com.miportal.authservice.domain.service.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -45,13 +47,13 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = tokenProvider.generateAccessToken(
                 usuario.getEmail(),
                 claims,
-                3600000 // 1Hr
+                jwtConfig.getAccessExpirationMillis()
         );
 
         String refreshTokenStr = tokenProvider.generateRefreshToken(
                 usuario.getEmail(),
                 claims,
-                604800000 // 7 días
+                jwtConfig.getRefreshExpirationMillis()
         );
 
         RefreshToken refreshToken = RefreshToken.builder()
@@ -69,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse refreshToken(RefreshTokenRequest request) {
         RefreshToken token = refreshTokenRepository.findByToken(request.getRefreshToken())
-                .orElseThrow(() -> new UnauthorizedException("Refresh token invalido"));
+                .orElseThrow(() -> new NotFoundException("Refresh token no encontrado"));
 
         if(token.getExpiracion().isBefore(LocalDateTime.now())) {
             refreshTokenRepository.delete(token);
@@ -84,7 +86,7 @@ public class AuthServiceImpl implements AuthService {
         String newAccessToken =  tokenProvider.generateAccessToken(
                 usuario.getEmail(),
                 claims,
-
+                jwtConfig.getAccessExpirationMillis()
         );
 
         return authMapper.toAuthResponse(newAccessToken, request.getRefreshToken());

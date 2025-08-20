@@ -1,4 +1,4 @@
-package com.miportal.authservice.service;
+package com.miportal.authservice.domain.service;
 
 public interface PasswordHasher {
     String hash(String rawPassword);

@@ -1,6 +1,6 @@
 package com.miportal.authservice.adapter.in.rest;
 
-import com.miportal.authservice.application.in.AuthService;
+import com.miportal.authservice.application.port.in.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

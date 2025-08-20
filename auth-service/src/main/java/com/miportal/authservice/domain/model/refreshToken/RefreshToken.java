@@ -1,7 +1,7 @@
-package com.miportal.authservice.model.refreshToken;
+package com.miportal.authservice.domain.model.refreshToken;
 
-import com.miportal.authservice.model.BaseEntity;
-import com.miportal.authservice.model.usuario.Usuario;
+import com.miportal.authservice.domain.model.BaseEntity;
+import com.miportal.authservice.domain.model.usuario.Usuario;
 
 import jakarta.persistence.*;
 import lombok.*;

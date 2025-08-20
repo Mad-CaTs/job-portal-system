@@ -2,7 +2,7 @@ package com.miportal.authservice.adapter.in.rest;
 
 import com.miportal.authservice.application.dto.usuario.UsuarioCreateRequest;
 import com.miportal.authservice.application.dto.usuario.UsuarioDTO;
-import com.miportal.authservice.application.in.UsuarioService;
+import com.miportal.authservice.application.port.in.UsuarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
