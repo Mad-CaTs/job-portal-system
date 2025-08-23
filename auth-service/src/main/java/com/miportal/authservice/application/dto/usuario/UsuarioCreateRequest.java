@@ -9,7 +9,6 @@ import lombok.Data;
 @Data
 public class UsuarioCreateRequest {
     @NotBlank(message = "El nombre de usuario es obligatorio")
-    @Size(min=3, max=20, message = "El nombre de usuario debe tener entre 3 y 20 caracteres")
     private String username;
 
     @NotBlank(message = "El email es obligatorio")
@@ -17,11 +16,6 @@ public class UsuarioCreateRequest {
     private String email;
 
     @NotBlank(message = "La contraseña es obligatoria")
-    @Size(min = 8, max = 50, message = "La contraseña debe tener entre 8 y 50 caracteres")
-    @Pattern(
-            regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d).{8,}$",
-            message = "La contraseña debe tener al menos una mayúscula, una minúscula y un número"
-    )
     private String password;
 
     @NotBlank(message = "El rol es obligatorio")
