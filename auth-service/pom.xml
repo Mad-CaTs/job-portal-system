@@ -54,6 +54,8 @@
 			<artifactId>mapstruct</artifactId>
 			<version>${mapstruct.version}</version>
 		</dependency>
+
+		<!-- MapStruct processor -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct-processor</artifactId>
@@ -84,7 +86,8 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+			<version>1.18.30</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- OpenAPI / Swagger -->
@@ -114,20 +117,14 @@
 
 	<build>
 		<plugins>
-			<!-- Spring Boot -->
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-
-			<!-- MapStruct annotation processing -->
+			<!-- Annotation processors -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.11.0</version>
 				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
+					<source>21</source>
+					<target>21</target>
 					<annotationProcessorPaths>
 						<path>
 							<groupId>org.mapstruct</groupId>

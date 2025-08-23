@@ -8,8 +8,7 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "TBL_USUARIO")
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder

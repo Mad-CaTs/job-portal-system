@@ -8,14 +8,17 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface AuthMapper {
-    @Mapping(source = "usuario.username", target = "username")
-    @Mapping(source = "usuario.email", target = "email")
-    @Mapping(source = "usuario.rol.nombre", target = "rol")
-    LoginResponse toLoginResponse(Usuario usuario, String token, String refreshToken);
 
-    @Mapping(target = "authenticated", constant = "true")
-    @Mapping(target = "message", constant = "Token renovado")
-    @Mapping(source = "accessToken", target = "accessToken")
-    @Mapping(source = "refreshToken", target = "refreshToken")
+    @Mapping(target = "username", source = "usuario.username")
+    @Mapping(target = "email", source = "usuario.email")
+    @Mapping(target = "rol", expression = "java(usuario.getRol().getNombre())")
+    @Mapping(target = "accessToken", expression = "java(accessToken)")
+    @Mapping(target = "refreshToken", expression = "java(refreshToken)")
+    LoginResponse toLoginResponse(Usuario usuario, String accessToken, String refreshToken);
+
+    @Mapping(target = "authenticated", expression = "java(true)")
+    @Mapping(target = "message", constant = "Autenticación exitosa")
+    @Mapping(target = "accessToken", expression = "java(accessToken)")
+    @Mapping(target = "refreshToken", expression = "java(refreshToken)")
     AuthResponse toAuthResponse(String accessToken, String refreshToken);
 }
