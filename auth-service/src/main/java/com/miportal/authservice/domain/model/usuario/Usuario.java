@@ -9,6 +9,7 @@ import lombok.experimental.SuperBuilder;
 @Entity
 @Table(name = "TBL_USUARIO")
 @Data
+@EqualsAndHashCode(callSuper=false)
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder

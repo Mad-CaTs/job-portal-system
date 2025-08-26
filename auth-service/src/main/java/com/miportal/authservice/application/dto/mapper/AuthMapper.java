@@ -9,8 +9,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface AuthMapper {
 
-    @Mapping(target = "username", source = "usuario.username")
-    @Mapping(target = "email", source = "usuario.email")
+    @Mapping(target = "username", expression = "java(usuario.getUsername())")
+    @Mapping(target = "email", expression = "java(usuario.getEmail())")
     @Mapping(target = "rol", expression = "java(usuario.getRol().getNombre())")
     @Mapping(target = "accessToken", expression = "java(accessToken)")
     @Mapping(target = "refreshToken", expression = "java(refreshToken)")
@@ -22,3 +22,4 @@ public interface AuthMapper {
     @Mapping(target = "refreshToken", expression = "java(refreshToken)")
     AuthResponse toAuthResponse(String accessToken, String refreshToken);
 }
+
