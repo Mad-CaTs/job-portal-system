@@ -3,14 +3,16 @@ package com.miportal.authservice.domain.model.rol;
 import com.miportal.authservice.domain.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
-@Entity
-@Table(name = "TBL_ROL")
 @Getter
 @Setter
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@EqualsAndHashCode(callSuper = false)
+@Entity
+@Table(name = "TBL_ROL")
 public class Rol extends BaseEntity {
 
     @Id

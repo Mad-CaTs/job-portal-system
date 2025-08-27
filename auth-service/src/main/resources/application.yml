@@ -2,26 +2,10 @@ server:
   port: 8080
 
 spring:
-  datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=${DB_NAME};encrypt=false
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  profiles:
+      active: dev
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.SQLServerDialect
-    show-sql: true
-
-jwt:
-  secret: ${JWT_SECRET}
-  access-expiration-millis: 300000       # 5 min
-  refresh-expiration-millis: 900000   # 15 min
-
-springdoc: # Swagger/OpenAPI
+springdoc:
   api-docs:
     enabled: true
   swagger-ui:

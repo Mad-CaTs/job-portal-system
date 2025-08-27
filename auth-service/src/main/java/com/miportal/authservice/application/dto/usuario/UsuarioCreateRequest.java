@@ -10,14 +10,17 @@ import lombok.Data;
 @Data
 @Builder
 public class UsuarioCreateRequest {
-    @NotBlank(message = "El nombre de usuario es obligatorio")
+
+    @NotBlank(message = "El username es obligatorio")
+    @Size(min = 3, message = "El username debe tener al menos 3 caracteres")
     private String username;
 
+    @Email(message = "El email debe ser válido")
     @NotBlank(message = "El email es obligatorio")
-    @Email(message = "Debe proporcionar un email valido")
     private String email;
 
     @NotBlank(message = "La contraseña es obligatoria")
+    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     private String password;
 
     @NotBlank(message = "El rol es obligatorio")

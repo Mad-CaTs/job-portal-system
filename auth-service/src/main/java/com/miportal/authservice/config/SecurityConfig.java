@@ -34,10 +34,13 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "api/auth/registro/**",
                                 "api/auth/refresh",
-                                "/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html"
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
                                 ).permitAll() // Publicos
                                 .anyRequest().authenticated() // Todo lo demas protegido
                         )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
