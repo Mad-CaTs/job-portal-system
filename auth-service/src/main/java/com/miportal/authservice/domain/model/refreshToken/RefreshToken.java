@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "TBL_REFRESH_TOKEN")
+@Table(name = "TBL_REFRESH_TOKEN", schema = "dbo")
 public class RefreshToken extends BaseEntity {
 
     @Id

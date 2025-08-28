@@ -1,7 +1,7 @@
 CREATE DATABASE DB_AuthService;
 USE DB_AuthService;
 
-CREATE TABLE TBL_USUARIO (
+CREATE TABLE [dbo].[tbl_usuario] (
     int_id BIGINT IDENTITY(1,1) PRIMARY KEY,
     vch_username VARCHAR(100) NOT NULL UNIQUE,
     vch_email VARCHAR(150) NOT NULL UNIQUE,
@@ -18,7 +18,7 @@ CREATE TABLE TBL_USUARIO (
 );
 
 
-CREATE TABLE TBL_ROL (
+CREATE TABLE [dbo].[tbl_rol] (
     int_id BIGINT IDENTITY(1,1) PRIMARY KEY,
     vch_nombre VARCHAR(50) NOT NULL UNIQUE,
     bit_estado BIT DEFAULT 1,
@@ -30,14 +30,14 @@ CREATE TABLE TBL_ROL (
 );
 
 -- Insertar roles fijos
-INSERT INTO TBL_ROL (vch_nombre, vch_usuario_creacion)
+INSERT INTO [dbo].[tbl_rol] (vch_nombre, vch_usuario_creacion)
 VALUES 
 ('POSTULANTE', 'system'),
 ('EMPRESA', 'system'),
 ('ADMIN', 'system');
 
 
-CREATE TABLE TBL_REFRESH_TOKEN (
+CREATE TABLE [dbo].[tbl_refresh_token] (
     int_id BIGINT IDENTITY(1,1) PRIMARY KEY,
     int_id_fk_usuario BIGINT NOT NULL,
     CONSTRAINT FK_REFRESH_USUARIO FOREIGN KEY (int_id_fk_usuario) REFERENCES TBL_USUARIO(int_id),
@@ -47,3 +47,10 @@ CREATE TABLE TBL_REFRESH_TOKEN (
     vch_usuario_creacion VARCHAR(100) NOT NULL,
     dt_fec_creacion DATETIME NOT NULL DEFAULT GETDATE()
 );
+
+
+INSERT INTO TBL_USUARIO (vch_username, vch_email, vch_password, int_id_fk_rol, vch_usuario_creacion)
+VALUES ('test', 'test@test.com', '$2a$10$hkqIDUsEHLiqvmFDTKr7fusDf3K/298Z13fy9hk4A19Mp/F1Ik4Oy', 1, 'system');
+
+
+select * from TBL_USUARIO

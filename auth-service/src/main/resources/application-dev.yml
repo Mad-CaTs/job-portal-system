@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=DB_AuthService;trustServerCertificate=true
+    url: jdbc:sqlserver://localhost;databaseName=DB_AuthService;encrypt=false;trustServerCertificate=true
     username: sa
     password: sql
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -11,9 +11,10 @@ spring:
     show-sql: true
     properties:
       hibernate:
+        default_schema: dbo
         dialect: org.hibernate.dialect.SQLServerDialect
 
-  jwt:
-    secret: my-dev-secret-key
-    access-expiration-millis: 300000       # 5 min
-    refresh-expiration-millis: 900000      # 15 min
+jwt:
+  secret: Y16Y9Kp3eX7Q53U9v1yph0K3NaiypABC
+  access-expiration-millis: 300000       # 5 min
+  refresh-expiration-millis: 900000      # 15 min

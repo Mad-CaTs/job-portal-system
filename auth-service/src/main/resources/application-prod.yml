@@ -1,14 +1,15 @@
 spring:
   datasource:
-    url: jdbc:sqlserver://localhost:1433;databaseName=${DB_NAME};encrypt=true;trustServerCertificate=true
+    url: jdbc:sqlserver://localhost;databaseName=${DB_NAME};encrypt=false;trustServerCertificate=true
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     properties:
       hibernate:
+        default_schema: dbo
         dialect: org.hibernate.dialect.SQLServerDialect
 
 jwt:

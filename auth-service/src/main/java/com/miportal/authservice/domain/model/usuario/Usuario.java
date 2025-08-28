@@ -6,13 +6,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-@Entity
-@Table(name = "TBL_USUARIO")
 @Data
 @EqualsAndHashCode(callSuper=false)
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@Entity
+@Table(name = "TBL_USUARIO", schema = "dbo")
 public class Usuario extends BaseEntity {
 
     @Id
