@@ -16,5 +16,5 @@ spring:
 
 jwt:
   secret: Y16Y9Kp3eX7Q53U9v1yph0K3NaiypABC
-  access-expiration-millis: 300000       # 5 min
-  refresh-expiration-millis: 900000      # 15 min
+  access-expiration-millis: 900000       # 15 min
+  refresh-expiration-millis: 3600000     # 1 hora

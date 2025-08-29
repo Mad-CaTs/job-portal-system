@@ -14,5 +14,5 @@ spring:
 
 jwt:
   secret: ${JWT_SECRET}
-  access-expiration-millis: 300000
-  refresh-expiration-millis: 900000
+  access-expiration-millis: 900000
+  refresh-expiration-millis: 3600000

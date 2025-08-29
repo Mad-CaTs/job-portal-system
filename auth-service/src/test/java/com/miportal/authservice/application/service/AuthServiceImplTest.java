@@ -100,8 +100,8 @@ class AuthServiceImplTest {
         when(passwordHasher.matches(request.getPassword(), usuario.getPassword()))
             .thenReturn(true);
 
-        when(jwtConfig.getAccessExpirationMillis()).thenReturn(300000L);
-        when(jwtConfig.getRefreshExpirationMillis()).thenReturn(900000L);
+        when(jwtConfig.getAccessExpirationMillis()).thenReturn(900000L);
+        when(jwtConfig.getRefreshExpirationMillis()).thenReturn(3600000L);
 
         when(tokenProvider.generateAccessToken(eq(usuario.getEmail()), anyMap(), anyLong()))
                 .thenReturn("access_token");

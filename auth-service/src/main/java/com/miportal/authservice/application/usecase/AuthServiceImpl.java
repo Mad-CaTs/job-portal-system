@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
         RefreshToken refreshToken = RefreshToken.builder()
                 .usuario(usuario)
                 .token(refreshTokenStr)
-                .expiracion(LocalDateTime.now().plusDays(7))
+                .expiracion(LocalDateTime.now().plusHours(1))
                 .usuarioCreacion("system")
                 .build();
 

@@ -48,9 +48,9 @@ CREATE TABLE [dbo].[tbl_refresh_token] (
     dt_fec_creacion DATETIME NOT NULL DEFAULT GETDATE()
 );
 
-
 INSERT INTO TBL_USUARIO (vch_username, vch_email, vch_password, int_id_fk_rol, vch_usuario_creacion)
 VALUES ('test', 'test@test.com', '$2a$10$hkqIDUsEHLiqvmFDTKr7fusDf3K/298Z13fy9hk4A19Mp/F1Ik4Oy', 1, 'system');
 
-
 select * from TBL_USUARIO
+select * from TBL_REFRESH_TOKEN
+
