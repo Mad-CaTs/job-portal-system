@@ -10,10 +10,12 @@ import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @AllArgsConstructor
@@ -26,21 +28,17 @@ public abstract class BaseEntity {
     private String usuarioCreacion;
 
     @CreatedDate
-    @Column(name = "dt_fec_creacion", nullable = false, updatable = false)
+    @Column(name = "dt_fec_creacion", nullable = false, updatable = false,
+            insertable = false)
     private LocalDateTime fechaCreacion;
 
     @LastModifiedBy
-    @Column(name = "vch_usuario_modificacion")
+    @Column(name = "vch_usuario_modificacion", insertable = false)
     private String usuarioModificacion;
 
     @LastModifiedDate
-    @Column(name = "dt_fec_modificacion")
+    @Column(name = "dt_fec_modificacion", insertable = false)
     private LocalDateTime fechaModificacion;
-
-    @PrePersist
-    public void prePersist() {
-        fechaCreacion = LocalDateTime.now();
-    }
 
     @PreUpdate
     public void preUpdate() {

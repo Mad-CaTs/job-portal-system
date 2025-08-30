@@ -29,8 +29,8 @@ public class Usuario extends BaseEntity {
     @Column(name = "vch_password", nullable = false, length = 255)
     private String password;
 
-    @Column(name = "bit_estado")
-    private Boolean estado = true;
+    @Column(name = "bit_estado", insertable = false)
+    private Boolean estado;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "int_id_fk_rol", nullable = false)

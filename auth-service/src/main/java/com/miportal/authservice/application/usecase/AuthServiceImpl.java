@@ -56,6 +56,9 @@ public class AuthServiceImpl implements AuthService {
                 jwtConfig.getRefreshExpirationMillis()
         );
 
+        // Eliminar refresh tokens anteriores del usuario
+        refreshTokenRepository.deleteByUsuario(usuario);
+
         RefreshToken refreshToken = RefreshToken.builder()
                 .usuario(usuario)
                 .token(refreshTokenStr)

@@ -12,14 +12,13 @@ import java.util.Optional;
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorProvider")
 public class AuditConfig {
+
     // Aquí se guarda como usuario auditor
     @Bean
-    public AuditorAware<String> auditorProvider(){
-        return () -> Optional.ofNullable(
-              Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
-                      .filter(Authentication::isAuthenticated)
-                      .map(Authentication::getName)
-                      .orElse("system") // Fallback
-        );
+    public AuditorAware<String> auditorProvider() {
+        return () -> Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
+                .filter(Authentication::isAuthenticated)
+                .map(Authentication::getName)
+                .or(() -> Optional.of("system")); // fallback
     }
 }
