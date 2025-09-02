@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:sqlserver://sqlserver:1433;databaseName=DB_AuthService;encrypt=false;trustServerCertificate=true
     username: sa
-    password: dckSql
+    password: DckSql2025!
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
 
   jpa:
