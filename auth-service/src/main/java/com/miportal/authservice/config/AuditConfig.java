@@ -16,9 +16,19 @@ public class AuditConfig {
     // Aquí se guarda como usuario auditor
     @Bean
     public AuditorAware<String> auditorProvider() {
-        return () -> Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
-                .filter(Authentication::isAuthenticated)
-                .map(Authentication::getName)
-                .or(() -> Optional.of("system")); // fallback
+        return () -> {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication == null ||  !authentication.isAuthenticated()) {
+                return Optional.of("system"); // Si no hay auth usamos system
+            }
+
+            String username = authentication.getName();
+
+            if("anonymousUser".equals(username)) {
+                return Optional.of("system"); // Reemplazamos anonymousUser
+            }
+            return Optional.of(username);
+        };
     }
 }

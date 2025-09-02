@@ -12,7 +12,7 @@ import lombok.Data;
 public class UsuarioCreateRequest {
 
     @NotBlank(message = "El username es obligatorio")
-    @Size(min = 3, message = "El username debe tener al menos 3 caracteres")
+    @Size(min = 3, max = 100, message = "El username debe tener entre 3 y 100 caracteres")
     private String username;
 
     @Email(message = "El email debe ser válido")
@@ -20,7 +20,7 @@ public class UsuarioCreateRequest {
     private String email;
 
     @NotBlank(message = "La contraseña es obligatoria")
-    @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
+    @Size(min = 4, max = 100, message = "La contraseña debe tener entre 4 y 100 caracteres")
     private String password;
 
     @NotBlank(message = "El rol es obligatorio")

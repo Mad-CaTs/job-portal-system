@@ -15,7 +15,8 @@ public class AuthRefreshController {
     private final AuthService authService;
 
     @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<AuthResponse> refreshToken(@CookieValue("refreshToken") String refreshToken) {
+        RefreshTokenRequest request = new RefreshTokenRequest(refreshToken);
         return ResponseEntity.ok(authService.refreshToken(request));
     }
 }

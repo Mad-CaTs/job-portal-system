@@ -7,6 +7,7 @@ import com.miportal.authservice.application.dto.auth.LoginRequest;
 import com.miportal.authservice.application.dto.auth.LoginResponse;
 import com.miportal.authservice.application.port.in.AuthService;
 import com.miportal.authservice.config.TestSecurityConfig;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,8 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = AuthLoginController.class, excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class)
@@ -55,7 +55,7 @@ class AuthLoginControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").value("access_token"))
-                .andExpect(jsonPath("$.refreshToken").value("refresh_token"))
-                .andExpect(jsonPath("$.rol").value("POSTULANTE"));
+                .andExpect(jsonPath("$.rol").value("POSTULANTE"))
+                .andExpect(header().stringValues("Set-Cookie", Matchers.hasItem(Matchers.containsString("refreshToken"))));
     }
 }

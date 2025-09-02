@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=dckSql
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "dckSql", "-Q", "select 1"]
+      interval: 10s
+      retries: 10
+
+  auth-service:
+    build: .
+    image: miportal/auth-service:latest
+    environment:
+      - DB_USERNAME=sa
+      - DB_PASSWORD=dckSql
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=DB_AuthService;encrypt=false;trustServerCertificate=true
+      - JWT_SECRET=Y16Y9Kp3eX7Q53U9v1yph0K3NaiypABC
+    ports:
+      - "8080:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy

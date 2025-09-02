@@ -1,5 +1,7 @@
 package com.miportal.authservice.domain.service;
 
+import io.jsonwebtoken.Claims;
+
 import java.util.Map;
 
 public interface TokenProvider {
@@ -7,4 +9,5 @@ public interface TokenProvider {
     String generateRefreshToken(String subject, Map<String, Object> claims, long expirationTimeMillis);
     boolean validateToken(String token);
     String getSubject(String token);
+    Claims getAllClaims(String token);
 }
