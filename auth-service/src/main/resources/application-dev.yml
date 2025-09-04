@@ -4,6 +4,9 @@ spring:
     username: sa
     password: DckSql2025!
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    hikari:
+      connection-timeout: 30000
+      initialization-fail-timeout: 60000
 
   jpa:
     hibernate:
@@ -17,8 +20,9 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+    baseline-on-migrate: true
 
 jwt:
   secret: Y16Y9Kp3eX7Q53U9v1yph0K3NaiypABC
-  access-expiration-millis: 900000       # 15 min
-  refresh-expiration-millis: 3600000     # 1 hora
+  access-expiration-millis: 900000
+  refresh-expiration-millis: 3600000

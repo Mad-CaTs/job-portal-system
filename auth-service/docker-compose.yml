@@ -1,28 +1,44 @@
-version: "3.8"
 services:
   sqlserver:
-    image: mcr.microsoft.com/mssql/server:2019-latest
+    image: mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
     container_name: sqlserver
     environment:
       - ACCEPT_EULA=Y
+      - SA_PASSWORD=DckSql2025!
       - MSSQL_SA_PASSWORD=DckSql2025!
+      - MSSQL_PID=Express
+      - MSSQL_PASSWORD_POLICY=OFF
+      - MSSQL_TCP_PORT=1433
     ports:
       - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    command:
+      - /bin/bash
+      - -c
+      - |
+        /opt/mssql/bin/sqlservr &
+        sleep 30
+        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P DckSql2025! -Q "IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'DB_AuthService') CREATE DATABASE DB_AuthService;"
+        tail -f /dev/null
     healthcheck:
-      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "DckSql2025!", "-Q", "select 1"]
+      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P DckSql2025! -d DB_AuthService -Q \"SELECT 1\" || exit 1" ]
       interval: 10s
+      timeout: 5s
       retries: 10
+      start_period: 60s
 
   auth-service:
     build: .
     image: miportal/auth-service:latest
     environment:
-      - DB_USERNAME=sa
-      - DB_PASSWORD=DckSql2025!
-      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=DB_AuthService;encrypt=false;trustServerCertificate=true
-      - JWT_SECRET=Y16Y9Kp3eX7Q53U9v1yph0K3NaiypABC
+      - SPRING_PROFILES_ACTIVE=dev
     ports:
       - "8080:8080"
     depends_on:
       sqlserver:
         condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  sqlserver_data:
