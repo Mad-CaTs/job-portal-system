@@ -20,12 +20,13 @@ public class AuthLogoutController {
                                        HttpServletResponse response) {
         authService.logout(refreshToken);
 
-        //Eliminar Cookie
+        // Eliminar Cookie
         ResponseCookie cookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
-                .secure(true)
-                .path("/api/auth/refresh")
-                .maxAge(0) // Expira inmediatamente
+                .secure(false)        // false en desarrollo
+                .path("/")            // path raíz, no específico
+                .maxAge(0)
+                .sameSite("Lax")      // Añadir para compatibilidad
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());

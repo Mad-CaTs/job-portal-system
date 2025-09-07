@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "TBL_ROL", schema = "dbo")
+@Table(name = "tbl_rol")
 public class Rol extends BaseEntity {
 
     @Id
@@ -23,6 +23,7 @@ public class Rol extends BaseEntity {
     @Column(name = "vch_nombre", nullable = false, unique = true, length = 50)
     private String nombre;
 
+    @Builder.Default
     @Column(name = "bit_estado")
     private Boolean estado = true;
 }

@@ -23,7 +23,7 @@
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<jjwt.version>0.11.5</jjwt.version>
 		<testcontainers.version>1.19.7</testcontainers.version>
-		<flyway.version>10.11.0</flyway.version>
+		<flyway.version>11.0.0</flyway.version>
 	</properties>
 
 	<dependencies>
@@ -43,10 +43,10 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
-		<!-- Base de datos: SQL Server -->
+		<!-- Base de datos: PostgreSQL -->
 		<dependency>
-			<groupId>com.microsoft.sqlserver</groupId>
-			<artifactId>mssql-jdbc</artifactId>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 
@@ -130,7 +130,7 @@
 			<version>2.5.4</version>
 		</dependency>
 
-		<!-- TESTCONTAINERS (integration tests with SQL Server) -->
+		<!-- TESTCONTAINERS (integration tests with PostgreSQL) -->
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>testcontainers</artifactId>
@@ -145,7 +145,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>mssqlserver</artifactId>
+			<artifactId>postgresql</artifactId>
 			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
@@ -153,12 +153,12 @@
 		<!-- Flyway -->
 		<dependency>
 			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
+			<artifactId>flyway-database-postgresql</artifactId>
 			<version>${flyway.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-sqlserver</artifactId>
+			<artifactId>flyway-core</artifactId>
 			<version>${flyway.version}</version>
 		</dependency>
 	</dependencies>

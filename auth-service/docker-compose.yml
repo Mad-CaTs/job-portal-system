@@ -1,32 +1,23 @@
 services:
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
-    container_name: sqlserver
+  postgresql:
+    image: postgres:15-alpine
+    container_name: postgresql
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=DckSql2025!
-      - MSSQL_SA_PASSWORD=DckSql2025!
-      - MSSQL_PID=Express
-      - MSSQL_PASSWORD_POLICY=OFF
-      - MSSQL_TCP_PORT=1433
+      - POSTGRES_DB=DB_AuthService
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=DckSql2025!
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8
     ports:
-      - "1433:1433"
+      - "5432:5432"
     volumes:
-      - sqlserver_data:/var/opt/mssql
-    command:
-      - /bin/bash
-      - -c
-      - |
-        /opt/mssql/bin/sqlservr &
-        sleep 30
-        /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P DckSql2025! -Q "IF NOT EXISTS(SELECT * FROM sys.databases WHERE name = 'DB_AuthService') CREATE DATABASE DB_AuthService;"
-        tail -f /dev/null
+      - postgresql_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
     healthcheck:
-      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P DckSql2025! -d DB_AuthService -Q \"SELECT 1\" || exit 1" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d DB_AuthService"]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 60s
+      retries: 5
+      start_period: 30s
 
   auth-service:
     build: .
@@ -36,9 +27,9 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      sqlserver:
+      postgresql:
         condition: service_healthy
     restart: unless-stopped
 
 volumes:
-  sqlserver_data:
+  postgresql_data:

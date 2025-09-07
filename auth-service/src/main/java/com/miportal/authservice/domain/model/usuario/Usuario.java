@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder
 @Entity
-@Table(name = "TBL_USUARIO", schema = "dbo")
+@Table(name = "tbl_usuario")
 public class Usuario extends BaseEntity {
 
     @Id
@@ -29,8 +29,9 @@ public class Usuario extends BaseEntity {
     @Column(name = "vch_password", nullable = false, length = 255)
     private String password;
 
-    @Column(name = "bit_estado", insertable = false)
-    private Boolean estado;
+    @Builder.Default
+    @Column(name = "bit_estado")
+    private Boolean estado = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "int_id_fk_rol", nullable = false)

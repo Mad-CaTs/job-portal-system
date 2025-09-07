@@ -12,10 +12,9 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.testcontainers.containers.MSSQLServerContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,16 +27,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthIntegrationTest {
 
     @Container
-    static final MSSQLServerContainer<?> sqlserver =
-            new MSSQLServerContainer<>(DockerImageName.parse("mcr.microsoft.com/mssql/server:2019-latest"))
-                    .acceptLicense()
-                    .withPassword("DckSql2025!");
+    static final PostgreSQLContainer<?> postgres =
+            new PostgreSQLContainer<>("postgres:15-alpine")
+                    .withDatabaseName("test_auth_db")
+                    .withUsername("test_user")
+                    .withPassword("test_pass");
 
     @DynamicPropertySource
     static void overrideProps(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", sqlserver::getJdbcUrl);
-        registry.add("spring.datasource.username", sqlserver::getUsername);
-        registry.add("spring.datasource.password", sqlserver::getPassword);
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+        registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
+
+        // Configuración para tests - usar create-drop y deshabilitar Flyway
+        registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
+        registry.add("spring.flyway.enabled", () -> "false");
     }
 
     @Autowired

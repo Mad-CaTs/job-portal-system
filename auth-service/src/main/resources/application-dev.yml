@@ -1,12 +1,12 @@
 spring:
   datasource:
-    url: jdbc:sqlserver://sqlserver:1433;databaseName=DB_AuthService;encrypt=false;trustServerCertificate=true
-    username: sa
+    url: jdbc:postgresql://postgresql:5432/DB_AuthService
+    username: postgres
     password: DckSql2025!
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    driver-class-name: org.postgresql.Driver
     hikari:
-      connection-timeout: 30000
-      initialization-fail-timeout: 60000
+      connection-timeout: 20000
+      maximum-pool-size: 10
 
   jpa:
     hibernate:
@@ -14,13 +14,17 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        default_schema: dbo
-        dialect: org.hibernate.dialect.SQLServerDialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
   flyway:
     enabled: true
     locations: classpath:db/migration
     baseline-on-migrate: true
+    sql-migration-prefix: V
+    sql-migration-separator: __
+    sql-migration-suffixes: .sql
 
 jwt:
   secret: Y16Y9Kp3eX7Q53U9v1yph0K3NaiypABC
