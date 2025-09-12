@@ -1,0 +1,80 @@
+<!-- Contenedor principal del formulario de login -->
+<div class="login-container">
+  <div class="login-card">
+    <!-- Título -->
+    <h2 class="login-title">Iniciar Sesión</h2>
+    
+    <!-- Formulario reactivo -->
+    <!-- [formGroup] vincula el formulario del componente con este HTML -->
+    <!-- (ngSubmit) ejecuta onSubmit() cuando se envía el formulario -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      
+      <!-- Campo Email -->
+      <div class="form-group">
+        <label for="email" class="form-label">Email:</label>
+        
+        <!-- formControlName vincula este input con el campo 'email' del FormGroup -->
+        <!-- [class.error] agrega la clase CSS 'error' cuando hasFieldError() retorna true -->
+        <input 
+          type="email" 
+          id="email"
+          formControlName="email"
+          class="form-input"
+          [class.error]="hasFieldError('email')"
+          placeholder="Ingresa tu email"
+        />
+        
+        <!-- Mostrar mensaje de error solo si el campo tiene errores -->
+        <!-- *ngIf es una directiva que muestra/oculta elementos según una condición -->
+        <div *ngIf="hasFieldError('email')" class="error-message">
+          {{ getFieldError('email') }}
+        </div>
+      </div>
+
+      <!-- Campo Password -->
+      <div class="form-group">
+        <label for="password" class="form-label">Contraseña:</label>
+        
+        <input 
+          type="password" 
+          id="password"
+          formControlName="password"
+          class="form-input"
+          [class.error]="hasFieldError('password')"
+          placeholder="Ingresa tu contraseña"
+        />
+        
+        <div *ngIf="hasFieldError('password')" class="error-message">
+          {{ getFieldError('password') }}
+        </div>
+      </div>
+
+      <!-- Mostrar error general de autenticación -->
+      <!-- Solo se muestra si errorMessage no está vacío -->
+      <div *ngIf="errorMessage" class="error-message error-general">
+        {{ errorMessage }}
+      </div>
+
+      <!-- Botón de envío -->
+      <!-- [disabled] deshabilita el botón cuando isLoading es true -->
+      <!-- type="submit" hace que este botón dispare el evento (ngSubmit) -->
+      <button 
+        type="submit" 
+        class="login-button"
+        [disabled]="isLoading"
+      >
+        <!-- Mostrar texto diferente si está cargando -->
+        <!-- Operador ternario: condición ? siTrue : siFalse -->
+        {{ isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión' }}
+      </button>
+
+      <!-- Enlace para ir al registro -->
+      <div class="register-link">
+        <p>¿No tienes cuenta? 
+          <!-- (click) ejecuta el método goToRegister() -->
+          <span class="link" (click)="goToRegister()">Regístrate aquí</span>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>

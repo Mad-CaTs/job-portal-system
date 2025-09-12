@@ -1,0 +1,146 @@
+/* Contenedor principal que centra el formulario */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 20px;
+}
+
+/* Tarjeta que contiene el formulario */
+.login-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Título del formulario */
+.login-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #2c3e50;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+/* Formulario */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Grupo de campo (label + input + error) */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* Etiquetas de los campos */
+.form-label {
+  font-weight: 500;
+  color: #34495e;
+  margin-bottom: 0.25rem;
+}
+
+/* Inputs del formulario */
+.form-input {
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+/* Input cuando tiene focus (está seleccionado) */
+.form-input:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* Input con error */
+.form-input.error {
+  border-color: #e74c3c;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+/* Mensajes de error */
+.error-message {
+  color: #e74c3c;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Error general (credenciales incorrectas, etc.) */
+.error-general {
+  background-color: #ffeaea;
+  border: 1px solid #e74c3c;
+  border-radius: 4px;
+  padding: 0.75rem;
+  text-align: center;
+}
+
+/* Botón de login */
+.login-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 0.875rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Botón en hover (cuando pasas el mouse) */
+.login-button:hover:not(:disabled) {
+  background-color: #2980b9;
+}
+
+/* Botón deshabilitado (cuando está cargando) */
+.login-button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Enlace de registro */
+.register-link {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.register-link p {
+  color: #7f8c8d;
+  margin: 0;
+}
+
+/* Texto clicable del enlace */
+.link {
+  color: #3498db;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  color: #2980b9;
+}
+
+/* Responsive: En pantallas pequeñas */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .login-title {
+    font-size: 1.5rem;
+  }
+}
