@@ -86,10 +86,12 @@ export class AuthService {
   * REFRESH DEL ACCESS TOKEN
   */
   refreshToken(): Observable<AuthResponse> {
+    //POST VACIO - El refreshToken va en la cookie automaticamente
     return this.http.post<AuthResponse>(`${this.API_URL}/refresh`, {}, {
       withCredentials: true //Para enviar la cookie del refreshToken
     }).pipe(
       tap(response => {
+        //Actualizar el accessToken guardado
         this.setAuthToken(response.accessToken);
       }),
       catchError(this.handleError)
@@ -100,10 +102,12 @@ export class AuthService {
   * LOGOUT
   */
   logout(): Observable<any> {
+    //POST VACIO - El refreshToken va en la cookie
     return this.http.post(`${this.API_URL}/logout`, {}, {
       withCredentials: true
     }).pipe(
       tap(() => {
+        //Limpiar todos los datos de autenticacion
         this.clearAuthData();
       }),
       catchError(this.handleError)
@@ -115,6 +119,7 @@ export class AuthService {
   */
   isAuthenticated(): boolean {
     const token = this.getAuthToken();
+    //Retorna true solo si hay token y no esta expirado
     return !!token && !this.isTokenExpired(token);
   }
 
@@ -122,6 +127,7 @@ export class AuthService {
   * OBTENER EL USUARIO ACTUAL
   */
   getCurrentUser(): User | null {
+    //Devuelve el valor actual del BehaviorSubject
     return this.currentUserSubject.value;
   }
 
@@ -129,9 +135,12 @@ export class AuthService {
   * OBTENER EL TOKEN DE AUTORIZACION
   */
   getAuthToken(): string | null {
+    //localStorage es almacenamiento del navegador que persiste entre sesiones
     return localStorage.getItem('accessToken');
   }
 
+
+  ///////////////////////////////////////METODOS PRIVADOS - USO INTERNO////////////////////////////////////////////////////////
   /**
   * GUARDAR TOKEN EN LOCAL STORAGE
   */
@@ -144,16 +153,24 @@ export class AuthService {
   */
   private extractUserFromToken(token: string): void {
     try{
+      //Un JWT tiene 3 partes separadas por puntos: header.payload.signature
+      //token.split('.')[1] obtiene el payload (parte del medio)
+      //atob() decodifica de Base64 a texto
+      //JSON.parse() convierte texto JSON a objeto JavaScript
       const payload = JSON.parse(atob(token.split('.')[1]));
+
+      //Crear objeto User con los datos del token
       const user: User = {
-        email: payload.sub,
-        role: payload.rol || payload.role,
+        email: payload.sub,                   // 'sub' es el estandar JWT para el sujeto (usuario)
+        role: payload.rol || payload.role,    // el backend usa 'rol'
         username: payload.username
       };
 
+      //Notificar a todos los componentes que estan "escuchando" que hay un nuevo usuario
       this.currentUserSubject.next(user);      
     } catch (error) {
       console.error('Error al decodificar token:', error);
+      //Si hay error, limpiar todo
       this.clearAuthData();
     }
   }
@@ -163,9 +180,13 @@ export class AuthService {
   */
   private checkStoredToken(): void {
     const token = this.getAuthToken();
+
+    //Si hay token guardado y no esta expirado
     if (token && !this.isTokenExpired(token)) {
+      //Extraer informacion del usuario
       this.extractUserFromToken(token);
     } else {
+      //Si no hay token o esta expirado, limpiar
       this.clearAuthData();
     }
   } 
@@ -175,10 +196,17 @@ export class AuthService {
   */
   private isTokenExpired(token: string): boolean {
     try{
+
+      //Decodificar el payload del token
       const payload = JSON.parse(atob(token.split('.')[1]));
+
+      //'exp' es el tiempo de expiracion en segundos (estandar JWT)
       const exp = payload.exp * 1000; //Convertir a milisegundos
+
+      //Comparar con tiempo actual
       return Date.now() >= exp;
     } catch (error) {
+      //Si hay error al decodificar, considerar expirado
       return true; //Si no se puede decodificar, considerarlo expirado
     }
   }
@@ -187,7 +215,9 @@ export class AuthService {
   * LIMPIAR DATOS DE AUTENTICACION
   */
   private clearAuthData(): void {
+    //Eliminar token del localStorage
     localStorage.removeItem('accessToken');
+    //Notificar que no hay usuario logueado
     this.currentUserSubject.next(null);
   }
 
@@ -198,14 +228,17 @@ export class AuthService {
     let errorMessage = 'Error Desconocido';
 
     if (error.error instanceof ErrorEvent) {
-      //Error del lado del cliente
+      //Error del lado del cliente (problemas de red, etc.)
       errorMessage = `Error : ${error.error.message}`;
     } else {
-      //Error del lado del servidor
+      //Error del lado del servidor (400, 401, 500, etc.)
       errorMessage = error.error?.message || `Error ${error.status}: ${error.statusText}`;
     }
 
     console.error('Error en AuthService:', errorMessage);
+
+    // throwError() crea un Observable que emite un error
+    // Los componentes que usen este servicio pueden capturar este error 
     return throwError(() => new Error(errorMessage));
   }
 }
