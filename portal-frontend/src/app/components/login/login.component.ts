@@ -102,7 +102,7 @@ export class LoginComponent {
       return 'Email no valido';
     }
 
-    if (field.errors['minlenght']) {
+    if (field.errors['minlength']) {
       return `${fieldName} debe tener al menos ${field.errors['minlength'].requiredLength} caracteres`;
     }
 

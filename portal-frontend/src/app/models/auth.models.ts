@@ -17,7 +17,6 @@ export interface RegisterRequest {
 // Response del login
 export interface LoginResponse {
   accessToken: string;
-  refreshToken: string;
   username: string;
   email: string;
   rol: string;

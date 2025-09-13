@@ -49,7 +49,7 @@ export class AuthService {
         this.setAuthToken(response.accessToken);
 
         // 2. Decodificar el token y extraer información del usuario
-        this.extractUserFromToken(response.refreshToken);    
+        this.extractUserFromToken(response.accessToken);    
       }),
       // catchError() captura errores y los transforma
       catchError(this.handleError)

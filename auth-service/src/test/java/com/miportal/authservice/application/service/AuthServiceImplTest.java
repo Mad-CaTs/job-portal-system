@@ -110,13 +110,12 @@ class AuthServiceImplTest {
 
         LoginResponse fakeResponse = LoginResponse.builder()
                 .accessToken("access_token")
-                .refreshToken("refresh_token")
                 .username("test")
                 .email("test@test.com")
                 .rol("POSTULANTE")
                 .build();
 
-        when(authMapper.toLoginResponse(usuario, "access_token", "refresh_token"))
+        when(authMapper.toLoginResponse(usuario, "access_token"))
                 .thenReturn(fakeResponse);
 
         // Act
@@ -124,7 +123,6 @@ class AuthServiceImplTest {
         // Assert
         assertNotNull(response);
         assertEquals("access_token", response.getAccessToken());
-        assertEquals("refresh_token", response.getRefreshToken());
         assertEquals("test@test.com", response.getEmail());
         assertEquals("POSTULANTE", response.getRol());
     }

@@ -42,7 +42,6 @@ class AuthLoginControllerIntegrationTest {
         LoginRequest request = new LoginRequest("test@test.com", "1234");
         LoginResponse response = LoginResponse.builder()
                 .accessToken("access_token")
-                .refreshToken("refresh_token")
                 .username("test")
                 .email("test@test.com")
                 .rol("POSTULANTE")

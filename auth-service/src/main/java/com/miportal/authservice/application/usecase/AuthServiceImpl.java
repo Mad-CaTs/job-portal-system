@@ -33,6 +33,18 @@ public class AuthServiceImpl implements AuthService {
     private final AuthMapper authMapper;
     private final JwtConfig jwtConfig;
 
+    // Variable para almacenar temporalmente el refreshToken
+    private final ThreadLocal<String> currentRefreshToken = new ThreadLocal<>();
+
+    /**
+     * Metodo auxiliar para obtener el refreshToken del último login
+     */
+    public String getLastRefreshToken() {
+        String token = currentRefreshToken.get();
+        currentRefreshToken.remove(); // Limpiar después de usar
+        return token;
+    }
+
     @Override
     public LoginResponse login(LoginRequest request) {
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
@@ -56,6 +68,8 @@ public class AuthServiceImpl implements AuthService {
                 jwtConfig.getRefreshExpirationMillis()
         );
 
+        currentRefreshToken.set(refreshTokenStr);
+
         // Eliminar refresh tokens anteriores del usuario
         refreshTokenRepository.deleteByUsuario(usuario);
 
@@ -68,7 +82,7 @@ public class AuthServiceImpl implements AuthService {
 
         refreshTokenRepository.save(refreshToken);
 
-        return authMapper.toLoginResponse(usuario, accessToken, refreshTokenStr);
+        return authMapper.toLoginResponse(usuario, accessToken);
     }
 
     @Override

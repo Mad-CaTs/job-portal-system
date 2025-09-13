@@ -23,20 +23,19 @@ public class AuthLoginController {
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
         LoginResponse loginResponse = authService.login(request);
 
-        // Crear cookie segura para refreshToken
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", loginResponse.getRefreshToken())
-                .httpOnly(true)       // No accesible desde JS
-                .secure(true)         // Solo HTTPS
-                .path("/api/auth/refresh") // Solo se envía a este endpoint
-                .sameSite("Strict")   // Previene CSRF
-                .maxAge(60 * 60)      // 1 hora (igual a refreshToken en DB)
+        // Obtener refreshToken del servicio
+        String refreshToken = authService.getLastRefreshToken();
+
+        // Crear cookie para refreshToken
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(3600)
+                .sameSite("Lax")
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());
-
-        // Quitamos el refreshToken del body para más seguridad
-        loginResponse.setRefreshToken(null);
-
         return ResponseEntity.ok(loginResponse);
     }
 }

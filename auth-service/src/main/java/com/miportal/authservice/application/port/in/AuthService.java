@@ -6,6 +6,7 @@ import com.miportal.authservice.application.dto.auth.LoginResponse;
 import com.miportal.authservice.application.dto.auth.RefreshTokenRequest;
 
 public interface AuthService {
+    String getLastRefreshToken();
     LoginResponse login(LoginRequest request);
     AuthResponse refreshToken(RefreshTokenRequest request);
     void logout(String refreshToken);
