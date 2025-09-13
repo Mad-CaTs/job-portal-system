@@ -1,7 +1,7 @@
 package com.miportal.authservice.adapter.in.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.miportal.authservice.adapter.in.rest.AuthLoginController;
+import com.miportal.authservice.adapter.in.rest.AuthController;
 import com.miportal.authservice.adapter.out.security.JwtFilter;
 import com.miportal.authservice.application.dto.auth.LoginRequest;
 import com.miportal.authservice.application.dto.auth.LoginResponse;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(controllers = AuthLoginController.class, excludeFilters = {
+@WebMvcTest(controllers = AuthController.class, excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtFilter.class)
 })
 @Import(TestSecurityConfig.class)
@@ -48,6 +48,7 @@ class AuthLoginControllerIntegrationTest {
                 .build();
 
         when(authService.login(any(LoginRequest.class))).thenReturn(response);
+        when(authService.getLastRefreshToken()).thenReturn("refresh_token");
 
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

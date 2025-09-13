@@ -39,6 +39,7 @@ public class AuthServiceImpl implements AuthService {
     /**
      * Metodo auxiliar para obtener el refreshToken del último login
      */
+    @Override
     public String getLastRefreshToken() {
         String token = currentRefreshToken.get();
         currentRefreshToken.remove(); // Limpiar después de usar
