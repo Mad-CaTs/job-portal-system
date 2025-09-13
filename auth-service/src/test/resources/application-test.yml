@@ -6,17 +6,21 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    defer-datasource-initialization: true
 
   flyway:
     enabled: false
-
-# Logging para debug
-logging:
-  level:
-    org.testcontainers: DEBUG
-    com.miportal: DEBUG
 
 jwt:
   secret: test-secret-key-12345678901234567890123456789012
   access-expiration-millis: 900000
   refresh-expiration-millis: 3600000
+
+# Logging para debug en tests
+logging:
+  level:
+    org.testcontainers: INFO
+    com.miportal: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
