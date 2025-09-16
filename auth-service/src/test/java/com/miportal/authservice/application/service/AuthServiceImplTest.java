@@ -5,7 +5,6 @@ import com.miportal.authservice.application.dto.auth.LoginResponse;
 import com.miportal.authservice.application.dto.mapper.AuthMapper;
 import com.miportal.authservice.application.exception.UnauthorizedException;
 import com.miportal.authservice.application.port.out.RefreshTokenRepository;
-import com.miportal.authservice.application.port.out.RolRepository;
 import com.miportal.authservice.application.port.out.UsuarioRepository;
 import com.miportal.authservice.application.usecase.AuthServiceImpl;
 import com.miportal.authservice.config.JwtConfig;
@@ -30,9 +29,6 @@ class AuthServiceImplTest {
 
     @Mock
     private UsuarioRepository usuarioRepository;
-
-    @Mock
-    private RolRepository rolRepository;
 
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
@@ -60,7 +56,8 @@ class AuthServiceImplTest {
                 .thenReturn(Optional.empty());
 
         // Act + Assert
-        assertThrows(UnauthorizedException.class, () -> authService.login(request));
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> authService.login(request));
+        assertEquals("Credenciales invalidas", exception.getMessage());
     }
 
     @Test
@@ -75,12 +72,13 @@ class AuthServiceImplTest {
         LoginRequest request = new LoginRequest("test@test.com", "wrongpass");
 
         when(usuarioRepository.findByEmail(request.getEmail()))
-            .thenReturn(Optional.of(usuario));
+                .thenReturn(Optional.of(usuario));
         when(passwordHasher.matches(request.getPassword(), usuario.getPassword()))
-            .thenReturn(false);
+                .thenReturn(false);
 
         // Act + Assert
-        assertThrows(UnauthorizedException.class, () -> authService.login(request));
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> authService.login(request));
+        assertEquals("Credenciales invalidas", exception.getMessage());
     }
 
     @Test
@@ -96,15 +94,18 @@ class AuthServiceImplTest {
         LoginRequest request = new LoginRequest("test@test.com", "1234");
 
         when(usuarioRepository.findByEmail(request.getEmail()))
-            .thenReturn(Optional.of(usuario));
+                .thenReturn(Optional.of(usuario));
+
         when(passwordHasher.matches(request.getPassword(), usuario.getPassword()))
-            .thenReturn(true);
+                .thenReturn(true);
 
         when(jwtConfig.getAccessExpirationMillis()).thenReturn(900000L);
+
         when(jwtConfig.getRefreshExpirationMillis()).thenReturn(3600000L);
 
         when(tokenProvider.generateAccessToken(eq(usuario.getEmail()), anyMap(), anyLong()))
                 .thenReturn("access_token");
+
         when(tokenProvider.generateRefreshToken(eq(usuario.getEmail()), anyMap(), anyLong()))
                 .thenReturn("refresh_token");
 

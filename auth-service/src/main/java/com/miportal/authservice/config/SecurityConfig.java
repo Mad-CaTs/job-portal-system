@@ -23,6 +23,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+// * RESPONSABILIDADES:
+// * - Configurar autenticación JWT
+// * - Definir rutas públicas (SOLO auth endpoints)
+// * - Configurar CORS para comunicación entre servicios
+// * - Configurar filtros de seguridad
+
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity // Permite @PreAuthorize encontroladores y servicios
@@ -39,10 +45,17 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                // Endpoints de autenticación
                                 "/api/auth/login",
                                 "/api/auth/logout",
-                                "/api/auth/registro/**",
                                 "/api/auth/refresh",
+
+                                // Endpoints para validación desde otros microservicios
+                                "/api/auth/validate",
+                                "/api/auth/user-info",
+                                "/api/auth/validate-role/**",
+
+                                // Documentación API (Swagger)
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -50,30 +63,27 @@ public class SecurityConfig {
                                 "/webjars/**"
                         ).permitAll()
 
-                        // Logout: autenticado (cualquier rol)
+                        // Logout requiere estar autenticado (para obtener refresh token)
                         .requestMatchers(HttpMethod.POST, "/api/auth/logout").authenticated()
 
-                        // Seguridad por rol
-//                        .requestMatchers(HttpMethod.GET, "/api/usuarios/**").hasAnyRole("ADMIN", "EMPRESA")
-//                        .requestMatchers(HttpMethod.POST, "/api/usuarios").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.PUT, "/api/usuarios/**").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.DELETE, "/api/usuarios/**").hasRole("ADMIN")
-
-                        // Todo lo demas autenticado
+                        // Cualquier otra ruta requiere autenticación
                         .anyRequest().authenticated()
                 )
+                // Agregar filtro JWT antes del filtro de autenticación estándar
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
+    // Configuracion de Spring Security para autenticar usuarios
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
+        authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 
+    // BCrypt para hash de contraseñas
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -84,19 +94,47 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    //Configuracion de CORS
+//     * CONFIGURACIÓN DE CORS
+//     * Permite requests desde:
+//     * - Frontend (Angular)
+//     * - Otros microservicios
+//     * - API Gateway
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
+        // Orígenes permitidos
         cfg.setAllowedOrigins(List.of(
-                "http://localhost:4200",
-                "http://localhost:5173"
+                "http://localhost:4200",         // Angular
+                "http://localhost:8080",         // Auth-service
+                "http://localhost:8081",         // Postulante-service
+                "http://localhost:8082",         // Empresa-service
+                "http://localhost:8083",         // Admin-service
+                "http://localhost:8090"          // API Gateway
         ));
 
+        // Métodos HTTP permitidos
         cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
-        cfg.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        cfg.setExposedHeaders(List.of("Authorization"));
+
+        // Headers permitidos
+        cfg.setAllowedHeaders(List.of(
+                "Authorization",                 // Para JWT tokens
+                "Content-Type",                  // Para JSON requests
+                "X-Requested-With",              // Para AJAX requests
+                "Accept",                        // Para especificar formato de respuesta
+                "Origin",                        // Para CORS
+                "Access-Control-Request-Method", // Para preflight requests
+                "Access-Control-Request-Headers" // Para preflight requests
+        ));
+
+        // Headers expuestos en la respuesta
+        cfg.setExposedHeaders(List.of(
+                "Authorization",                 // Para que el frontend pueda leer tokens
+                "Content-Disposition"            // Para downloads de archivos
+        ));
+
+        // Permitir envío de cookies (para refresh token)
         cfg.setAllowCredentials(true);
 
+        // Aplicar configuración a todas las rutas
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);
         return source;

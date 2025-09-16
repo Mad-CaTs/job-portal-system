@@ -21,6 +21,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+// * RESPONSABILIDADES:
+// * - Extraer y validar tokens JWT de headers Authorization
+// * - Establecer autenticación en SecurityContext para usuarios válidos
+// * - Permitir acceso público a endpoints de autenticación y validación
+// * - Manejar fallback cuando no se pueden extraer claims del token
 @Component
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
@@ -31,17 +36,24 @@ public class JwtFilter extends OncePerRequestFilter {
     // Rutas públicas que no requieren token
     private static final List<String> EXCLUDED_PATHS = List.of(
             "/api/auth/login",
-            "/api/auth/registro/**",
+            "/api/auth/logout",
             "/api/auth/refresh",
-            "/v3/api-docs",
-            "/swagger-ui",
+
+            "/api/auth/validate",
+            "/api/auth/user-info",
+            "/api/auth/validate-role/**",
+
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
             "/swagger-ui.html",
-            "/swagger-resources",
-            "/webjars"
+            "/swagger-resources/**",
+            "/webjars/**"
     );
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
+    // Se ejecuta una vez por request HTTP entrante.
+    // Valida tokens JWT y establece autenticación en SecurityContext.
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -50,7 +62,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // Excluir rutas públicas (match con patrones)
+        // Excluir rutas públicas
         if (isExcluded(path)) {
             filterChain.doFilter(request, response);
             return;
@@ -64,7 +76,7 @@ public class JwtFilter extends OncePerRequestFilter {
             if (tokenProvider.validateToken(jwt)) {
                 String subject = tokenProvider.getSubject(jwt); // Email
 
-                // Intentamos extraer la claim "rol" desde el token
+                // Extraer la claim "rol" desde el token
                 Optional<String> maybeRole = extractRoleFromToken(jwt);
 
                 List<GrantedAuthority> authorities;
@@ -89,15 +101,12 @@ public class JwtFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // VERIFICAR SI UNA RUTA ESTÁ EXCLUIDA
     private boolean isExcluded(String path) {
         return EXCLUDED_PATHS.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
     }
 
-    /**
-     * Intenta obtener la claim "rol" desde el token usando tokenProvider.getAllClaims(token).
-     * Si tu TokenProvider no implementa getAllClaims(...) el método lanzará UnsupportedOperationException
-     * y el filtro hará fallback a cargar UserDetails desde DB.
-     */
+    // EXTRAER ROL DEL TOKEN JWT
     private Optional<String> extractRoleFromToken(String token) {
         try {
             Claims claims = tokenProvider.getAllClaims(token);

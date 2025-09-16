@@ -22,6 +22,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -84,7 +85,7 @@ class AuthIntegrationTest {
             log.info("Número de roles en BD: {}", roleCount);
 
             if (roleCount == 0) {
-                log.error("❌ NO HAY ROLES EN LA BD - Esto causará fallos en el registro");
+                log.error("NO HAY ROLES EN LA BD - Esto causará fallos en el registro");
             } else {
                 rs = stmt.executeQuery("SELECT vch_nombre FROM tbl_rol");
                 log.info("Roles disponibles:");
@@ -92,33 +93,58 @@ class AuthIntegrationTest {
                     log.info("  - {}", rs.getString("vch_nombre"));
                 }
             }
+
+            // CREAR USUARIOS DE PRUEBA PARA TESTING (ya que no podemos registrarlos por API)
+            createTestUsers(conn);
         }
+    }
+
+    private void createTestUsers(Connection conn) throws Exception {
+        // Password hasheada para "1234" usando BCrypt
+        String hashedPassword = "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi."; // "1234"
+
+        String insertUser = """
+            INSERT INTO tbl_usuario (vch_username, vch_email, vch_password, bit_estado, int_id_fk_rol, vch_usuario_creacion, dt_fec_creacion)
+            SELECT ?, ?, ?, true, r.int_id, 'system', CURRENT_TIMESTAMP
+            FROM tbl_rol r 
+            WHERE r.vch_nombre = ?
+            ON CONFLICT (vch_email) DO NOTHING
+        """;
+
+        // Usuario para primer test
+        try (PreparedStatement stmt = conn.prepareStatement(insertUser)) {
+            stmt.setString(1, "junitUser");
+            stmt.setString(2, "junit@test.com");
+            stmt.setString(3, hashedPassword);
+            stmt.setString(4, "POSTULANTE");
+            stmt.executeUpdate();
+        }
+
+        // Usuario para segundo test
+        try (PreparedStatement stmt = conn.prepareStatement(insertUser)) {
+            stmt.setString(1, "pepito");
+            stmt.setString(2, "pepito@gmail.com");
+            stmt.setString(3, hashedPassword);
+            stmt.setString(4, "POSTULANTE");
+            stmt.executeUpdate();
+        }
+
+        // Usuario para tercer test
+        try (PreparedStatement stmt = conn.prepareStatement(insertUser)) {
+            stmt.setString(1, "empresa1");
+            stmt.setString(2, "empresa@test.com");
+            stmt.setString(3, hashedPassword);
+            stmt.setString(4, "EMPRESA");
+            stmt.executeUpdate();
+        }
+
+        log.info("Usuarios de prueba creados");
     }
 
     @Test
     void registroYLoginDeberianFuncionar() throws Exception {
-        log.info("=== TEST: Registro y Login ===");
-
-        // REGISTRO
-        MvcResult registroResult = mockMvc.perform(post("/api/auth/registro/postulante")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                            {
-                              "username": "junitUser",
-                              "email": "junit@test.com",
-                              "password": "1234",
-                              "rol": "POSTULANTE"
-                            }
-                            """))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.email").value("junit@test.com"))
-                .andExpect(jsonPath("$.rol").value("POSTULANTE"))
-                .andReturn();
-
-        log.info("Registro exitoso: {}", registroResult.getResponse().getContentAsString());
-
-        // LOGIN
+        log.info("=== TEST: Login (usuario ya existe en BD) ===");
+        // LOGIN (el usuario ya fue creado en setUp())
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -148,22 +174,7 @@ class AuthIntegrationTest {
     @Test
     void refreshTokenDebeRetornarNuevoAccessToken() throws Exception {
         log.info("=== TEST: Refresh Token ===");
-
-        // REGISTRO INICIAL
-        mockMvc.perform(post("/api/auth/registro/postulante")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                            {
-                              "username": "pepito",
-                              "email": "pepito@gmail.com",
-                              "password": "1234",
-                              "rol": "POSTULANTE"
-                            }
-                            """))
-                .andDo(print())
-                .andExpect(status().isOk());
-
-        // LOGIN PARA OBTENER REFRESH TOKEN
+        // LOGIN PARA OBTENER REFRESH TOKEN (el usuario ya existe en BD)
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -195,21 +206,7 @@ class AuthIntegrationTest {
     @Test
     void logoutDebeEliminarRefreshToken() throws Exception {
         log.info("=== TEST: Logout ===");
-
-        // Registro y login inicial
-        mockMvc.perform(post("/api/auth/registro/empresa")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                            {
-                              "username": "empresa1",
-                              "email": "empresa@test.com",
-                              "password": "1234",
-                              "rol": "EMPRESA"
-                            }
-                            """))
-                .andDo(print())
-                .andExpect(status().isOk());
-
+        // LOGIN (el usuario ya existe en BD)
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
