@@ -7,25 +7,42 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+        jdbc:
+          time_zone: UTC
     defer-datasource-initialization: true
 
+  # Inicialización de datos de test
   sql:
     init:
       mode: always
       data-locations: classpath:V1__init.sql
+      encoding: utf-8
+      continue-on-error: false
 
+  # Deshabilitar Flyway en tests
   flyway:
     enabled: false
 
+# Configuración JWT para tests
 jwt:
   secret: test-secret-key-12345678901234567890123456789012
   access-expiration-millis: 900000
   refresh-expiration-millis: 3600000
 
-# Logging para debug en tests
+# Logging detallado para debugging
 logging:
   level:
-    org.testcontainers: INFO
-    com.miportal: DEBUG
-    org.springframework.security: DEBUG
-    org.hibernate.SQL: DEBUG
+    com.miportal: DEBUG                   # Logs de la aplicación
+    org.springframework.web: DEBUG        # Logs de Spring MVC
+    org.springframework.security: DEBUG   # Logs de seguridad
+    org.hibernate.SQL: DEBUG              # Queries SQL
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE # Parámetros SQL
+    org.testcontainers: INFO              # Logs de Testcontainers (menos verbosos)
+    org.springframework.test: DEBUG       # Logs de testing
+    ROOT: INFO
+
+# Configuración para mostrar stack traces completos en tests
+server:
+  error:
+    include-stacktrace: always
+    include-message: always

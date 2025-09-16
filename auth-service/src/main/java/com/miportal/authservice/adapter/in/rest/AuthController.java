@@ -5,7 +5,6 @@ import com.miportal.authservice.application.dto.auth.LoginRequest;
 import com.miportal.authservice.application.dto.auth.LoginResponse;
 import com.miportal.authservice.application.dto.auth.RefreshTokenRequest;
 import com.miportal.authservice.application.port.in.AuthService;
-import com.miportal.authservice.application.port.in.UsuarioService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

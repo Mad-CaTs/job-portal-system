@@ -28,8 +28,7 @@ public abstract class BaseEntity {
     private String usuarioCreacion;
 
     @CreatedDate
-    @Column(name = "dt_fec_creacion", nullable = false, updatable = false,
-            insertable = false)
+    @Column(name = "dt_fec_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
     @LastModifiedBy
@@ -42,6 +41,8 @@ public abstract class BaseEntity {
 
     @PreUpdate
     public void preUpdate() {
-        fechaModificacion = LocalDateTime.now();
+        if (fechaModificacion == null) {
+            fechaModificacion = LocalDateTime.now();
+        }
     }
 }
