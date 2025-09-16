@@ -93,7 +93,7 @@ Frontend (Angular) → API Gateway → Microservices → SQL Server
 - **Maven 3.8+**
 - **Angular CLI 18+**
 - **Docker & Docker Compose**
-- **SQL Server Database**
+- **PostgreSQL Database**
 
 ---
 
