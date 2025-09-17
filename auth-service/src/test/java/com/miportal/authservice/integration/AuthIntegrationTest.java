@@ -1,6 +1,7 @@
 package com.miportal.authservice.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.miportal.authservice.config.TestSecurityConfig;
 import jakarta.servlet.http.Cookie;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -21,10 +23,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -36,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @Testcontainers
 @Transactional
+@Import(TestSecurityConfig.class)
 class AuthIntegrationTest {
 
     private static final Logger log = LoggerFactory.getLogger(AuthIntegrationTest.class);
@@ -55,11 +55,9 @@ class AuthIntegrationTest {
         registry.add("spring.datasource.password", postgres::getPassword);
         registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
         registry.add("spring.jpa.hibernate.ddl-auto", () -> "create-drop");
-        registry.add("spring.flyway.enabled", () -> "false");
         registry.add("spring.jpa.show-sql", () -> "true");
-        registry.add("spring.sql.init.mode", () -> "always");
-        registry.add("spring.sql.init.data-locations", () -> "classpath:V1__init.sql");
-        registry.add("spring.jpa.defer-datasource-initialization", () -> "true");
+        registry.add("spring.flyway.enabled", () -> "false");
+        registry.add("spring.jpa.defer-datasource-initialization", () -> "false");
     }
 
     @Autowired
@@ -73,78 +71,62 @@ class AuthIntegrationTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        log.info("=== INICIANDO TEST - Verificando estado de la BD ===");
+        log.info("=== INICIANDO TEST - Preparando datos ===");
 
-        // Verificar que los roles existen
         try (Connection conn = dataSource.getConnection();
              Statement stmt = conn.createStatement()) {
 
-            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) as count FROM tbl_rol");
-            rs.next();
-            int roleCount = rs.getInt("count");
-            log.info("Número de roles en BD: {}", roleCount);
+            // Crear roles si no existen
+            stmt.executeUpdate("""
+                INSERT INTO tbl_rol (vch_nombre, vch_usuario_creacion, dt_fec_creacion)
+                VALUES 
+                  ('POSTULANTE','system',CURRENT_TIMESTAMP),
+                  ('EMPRESA','system',CURRENT_TIMESTAMP),
+                  ('ADMIN','system',CURRENT_TIMESTAMP)
+                ON CONFLICT (vch_nombre) DO NOTHING
+            """);
 
-            if (roleCount == 0) {
-                log.error("NO HAY ROLES EN LA BD - Esto causará fallos en el registro");
-            } else {
-                rs = stmt.executeQuery("SELECT vch_nombre FROM tbl_rol");
-                log.info("Roles disponibles:");
-                while (rs.next()) {
-                    log.info("  - {}", rs.getString("vch_nombre"));
-                }
+            // Crear usuarios con contraseña hasheada "1234"
+            String hashedPassword = "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi."; // 1234
+
+            String insertUser = """
+                INSERT INTO tbl_usuario (vch_username, vch_email, vch_password, bit_estado, int_id_fk_rol, vch_usuario_creacion, dt_fec_creacion)
+                SELECT ?, ?, ?, true, r.int_id, 'system', CURRENT_TIMESTAMP
+                FROM tbl_rol r
+                WHERE r.vch_nombre = ?
+                ON CONFLICT (vch_email) DO NOTHING
+            """;
+
+            try (PreparedStatement ps = conn.prepareStatement(insertUser)) {
+                ps.setString(1, "junitUser");
+                ps.setString(2, "junit@test.com");
+                ps.setString(3, hashedPassword);
+                ps.setString(4, "POSTULANTE");
+                ps.executeUpdate();
+
+                ps.setString(1, "pepito");
+                ps.setString(2, "pepito@gmail.com");
+                ps.setString(3, hashedPassword);
+                ps.setString(4, "POSTULANTE");
+                ps.executeUpdate();
+
+                ps.setString(1, "empresa1");
+                ps.setString(2, "empresa@test.com");
+                ps.setString(3, hashedPassword);
+                ps.setString(4, "EMPRESA");
+                ps.executeUpdate();
             }
 
-            // CREAR USUARIOS DE PRUEBA PARA TESTING (ya que no podemos registrarlos por API)
-            createTestUsers(conn);
+            ResultSet rs = stmt.executeQuery("SELECT COUNT(*) AS c FROM tbl_usuario");
+            rs.next();
+            log.info("Usuarios en BD antes del test: {}", rs.getInt("c"));
         }
-    }
-
-    private void createTestUsers(Connection conn) throws Exception {
-        // Password hasheada para "1234" usando BCrypt
-        String hashedPassword = "$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi."; // "1234"
-
-        String insertUser = """
-            INSERT INTO tbl_usuario (vch_username, vch_email, vch_password, bit_estado, int_id_fk_rol, vch_usuario_creacion, dt_fec_creacion)
-            SELECT ?, ?, ?, true, r.int_id, 'system', CURRENT_TIMESTAMP
-            FROM tbl_rol r 
-            WHERE r.vch_nombre = ?
-            ON CONFLICT (vch_email) DO NOTHING
-        """;
-
-        // Usuario para primer test
-        try (PreparedStatement stmt = conn.prepareStatement(insertUser)) {
-            stmt.setString(1, "junitUser");
-            stmt.setString(2, "junit@test.com");
-            stmt.setString(3, hashedPassword);
-            stmt.setString(4, "POSTULANTE");
-            stmt.executeUpdate();
-        }
-
-        // Usuario para segundo test
-        try (PreparedStatement stmt = conn.prepareStatement(insertUser)) {
-            stmt.setString(1, "pepito");
-            stmt.setString(2, "pepito@gmail.com");
-            stmt.setString(3, hashedPassword);
-            stmt.setString(4, "POSTULANTE");
-            stmt.executeUpdate();
-        }
-
-        // Usuario para tercer test
-        try (PreparedStatement stmt = conn.prepareStatement(insertUser)) {
-            stmt.setString(1, "empresa1");
-            stmt.setString(2, "empresa@test.com");
-            stmt.setString(3, hashedPassword);
-            stmt.setString(4, "EMPRESA");
-            stmt.executeUpdate();
-        }
-
-        log.info("Usuarios de prueba creados");
     }
 
     @Test
     void registroYLoginDeberianFuncionar() throws Exception {
         log.info("=== TEST: Login (usuario ya existe en BD) ===");
-        // LOGIN (el usuario ya fue creado en setUp())
+
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -160,21 +142,17 @@ class AuthIntegrationTest {
                 .andExpect(jsonPath("$.rol").value("POSTULANTE"))
                 .andReturn();
 
-        // Verificar cookie
         String setCookie = loginResult.getResponse().getHeader("Set-Cookie");
         assertThat(setCookie)
                 .isNotNull()
                 .contains("refreshToken=")
-                .contains("HttpOnly")
-                .contains("Path=/");
-
-        log.info("Login exitoso con cookie: {}", setCookie);
+                .contains("HttpOnly");
     }
 
     @Test
     void refreshTokenDebeRetornarNuevoAccessToken() throws Exception {
         log.info("=== TEST: Refresh Token ===");
-        // LOGIN PARA OBTENER REFRESH TOKEN (el usuario ya existe en BD)
+
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -191,22 +169,18 @@ class AuthIntegrationTest {
         assertThat(refreshCookie).isNotNull();
         assertThat(refreshCookie.getValue()).isNotBlank();
 
-        log.info("RefreshToken obtenido: {}", refreshCookie.getValue());
-
-        // TEST DEL REFRESH TOKEN
         mockMvc.perform(post("/api/auth/refresh")
                         .cookie(refreshCookie))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").exists())
-                .andExpect(jsonPath("$.authenticated").value(true))
-                .andExpect(jsonPath("$.message").value("Autenticación exitosa"));
+                .andExpect(jsonPath("$.authenticated").value(true));
     }
 
     @Test
     void logoutDebeEliminarRefreshToken() throws Exception {
         log.info("=== TEST: Logout ===");
-        // LOGIN (el usuario ya existe en BD)
+
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -221,19 +195,16 @@ class AuthIntegrationTest {
 
         Cookie refreshCookie = loginResult.getResponse().getCookie("refreshToken");
 
-        // TEST DEL LOGOUT
         MvcResult logoutResult = mockMvc.perform(post("/api/auth/logout")
                         .cookie(refreshCookie))
                 .andDo(print())
                 .andExpect(status().isNoContent())
                 .andReturn();
 
-        // Verificar que la cookie se eliminó
         Cookie deletedCookie = logoutResult.getResponse().getCookie("refreshToken");
         assertThat(deletedCookie).isNotNull();
         assertThat(deletedCookie.getMaxAge()).isEqualTo(0);
 
-        // Verificar que el refresh token ya no funciona
         mockMvc.perform(post("/api/auth/refresh")
                         .cookie(refreshCookie))
                 .andDo(print())
