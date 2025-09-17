@@ -10,15 +10,20 @@ jobs:
   build:
     runs-on: ubuntu-latest
     services:
-      mssql:
-        image: mcr.microsoft.com/mssql/server:2019-latest
+      # Cambiar a PostgreSQL para coincidir con el proyecto
+      postgres:
+        image: postgres:15-alpine
         env:
-          ACCEPT_EULA: "Y"
-          SA_PASSWORD: "DckSql2025!"
-        ports: ["1433:1433"]
+          POSTGRES_DB: test_auth_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_pass
+        ports:
+          - "5432:5432"
         options: >-
-          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P DckSql2025! -Q 'select 1'"
-          --health-interval 10s --health-timeout 5s --health-retries 10
+          --health-cmd "pg_isready -U test_user -d test_auth_db"
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 10
 
     steps:
       - uses: actions/checkout@v4
@@ -28,6 +33,11 @@ jobs:
         with:
           java-version: 21
           distribution: temurin
+
+      # Variables de entorno para tests
+      - name: Set test environment variables
+        run: |
+          echo "SPRING_PROFILES_ACTIVE=test" >> $GITHUB_ENV
 
       - name: Build and run tests
         run: mvn -B -DskipTests=false verify

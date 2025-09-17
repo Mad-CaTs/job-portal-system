@@ -36,12 +36,7 @@ public class JwtFilter extends OncePerRequestFilter {
     // Rutas públicas que no requieren token
     private static final List<String> EXCLUDED_PATHS = List.of(
             "/api/auth/login",
-            "/api/auth/logout",
             "/api/auth/refresh",
-
-            "/api/auth/validate",
-            "/api/auth/user-info",
-            "/api/auth/validate-role/**",
 
             "/v3/api-docs/**",
             "/swagger-ui/**",

@@ -5,7 +5,6 @@ import com.miportal.authservice.adapter.out.security.JwtFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -44,46 +43,40 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                // Endpoints de autenticación
-                                "/api/auth/login",
-                                "/api/auth/logout",
-                                "/api/auth/refresh",
+                    .requestMatchers(
+                            "/api/auth/login",
+                            "/api/auth/refresh",
 
-                                // Endpoints para validación desde otros microservicios
-                                "/api/auth/validate",
-                                "/api/auth/user-info",
-                                "/api/auth/validate-role/**",
+                            "/v3/api-docs/**",
+                            "/swagger-ui/**",
+                            "/swagger-ui.html",
+                            "/swagger-resources/**",
+                            "/webjars/**"
+                    ).permitAll()
 
-                                // Documentación API (Swagger)
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/swagger-resources/**",
-                                "/webjars/**"
-                        ).permitAll()
+                    // RUTAS QUE REQUIEREN TOKEN VÁLIDO (para validación entre microservicios)
+                    .requestMatchers(
+                            "/api/auth/logout", // Necesita cookie refreshToken
+                            "/api/auth/validate",        // Para otros microservicios
+                            "/api/auth/user-info",       // Para obtener info del usuario
+                            "/api/auth/validate-role/**" // Para validar roles
+                    ).authenticated()
 
-                        // Logout requiere estar autenticado (para obtener refresh token)
-                        .requestMatchers(HttpMethod.POST, "/api/auth/logout").authenticated()
-
-                        // Cualquier otra ruta requiere autenticación
-                        .anyRequest().authenticated()
+                    // Todo lo demas autenticado
+                    .anyRequest().authenticated()
                 )
-                // Agregar filtro JWT antes del filtro de autenticación estándar
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
-    // Configuracion de Spring Security para autenticar usuarios
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setPasswordEncoder(new BCryptPasswordEncoder());
         return authProvider;
     }
 
-    // BCrypt para hash de contraseñas
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -94,14 +87,9 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-//     * CONFIGURACIÓN DE CORS
-//     * Permite requests desde:
-//     * - Frontend (Angular)
-//     * - Otros microservicios
-//     * - API Gateway
+    //Configuracion de CORS
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
-        // Orígenes permitidos
         cfg.setAllowedOrigins(List.of(
                 "http://localhost:4200",         // Angular
                 "http://localhost:8080",         // Auth-service
@@ -111,33 +99,13 @@ public class SecurityConfig {
                 "http://localhost:8090"          // API Gateway
         ));
 
-        // Métodos HTTP permitidos
         cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
-
-        // Headers permitidos
-        cfg.setAllowedHeaders(List.of(
-                "Authorization",                 // Para JWT tokens
-                "Content-Type",                  // Para JSON requests
-                "X-Requested-With",              // Para AJAX requests
-                "Accept",                        // Para especificar formato de respuesta
-                "Origin",                        // Para CORS
-                "Access-Control-Request-Method", // Para preflight requests
-                "Access-Control-Request-Headers" // Para preflight requests
-        ));
-
-        // Headers expuestos en la respuesta
-        cfg.setExposedHeaders(List.of(
-                "Authorization",                 // Para que el frontend pueda leer tokens
-                "Content-Disposition"            // Para downloads de archivos
-        ));
-
-        // Permitir envío de cookies (para refresh token)
+        cfg.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        cfg.setExposedHeaders(List.of("Authorization"));
         cfg.setAllowCredentials(true);
 
-        // Aplicar configuración a todas las rutas
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);
         return source;
     }
 }
-
