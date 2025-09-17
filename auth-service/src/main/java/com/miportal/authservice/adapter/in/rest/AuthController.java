@@ -29,8 +29,6 @@ import java.util.Map;
 public class AuthController {
     private final AuthService authService;
 
-    // ######################### ENDPOINTS DE AUTENTICACIÓN ##########################################
-
     // Login - Iniciar Sesion
     @Operation(
             summary = "Iniciar Sesion",
