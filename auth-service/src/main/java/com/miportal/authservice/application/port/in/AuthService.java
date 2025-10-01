@@ -12,8 +12,4 @@ public interface AuthService {
     LoginResponse login(LoginRequest request);
     AuthResponse refreshToken(RefreshTokenRequest request);
     void logout(String refreshToken);
-    boolean validateToken(String token);
-    Map<String, Object> extractTokenClaims(String token);
-    Map<String, Object> getUserInfoFromToken(String token);
-    boolean hasRole(String token, String requiredRole);
 }

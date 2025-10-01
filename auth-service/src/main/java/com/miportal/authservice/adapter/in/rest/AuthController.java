@@ -14,12 +14,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -123,148 +120,6 @@ public class AuthController {
         } catch (Exception e) {
             log.error("Error al renovar token: {}", e.getMessage());
             throw e;
-        }
-    }
-
-    // ValidateToken - Validar Token JWT
-    @Operation(
-            summary = "Validar token JWT",
-            description = "Valida si un token JWT es válido y no ha expirado. Usado por otros microservicios."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Token validado (ver response body para resultado)"),
-            @ApiResponse(responseCode = "400", description = "Token no proporcionado")
-    })
-    @PostMapping("/validate")
-    public ResponseEntity<Map<String, Object>> validateToken(
-            @Parameter(description = "Token JWT en header Authorization: Bearer <token>", required = true)
-            @RequestHeader("Authorization") String authHeader) {
-
-        try {
-            // Extraer token del header "Bearer <token>"
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                log.warn("Header Authorization inválido o faltante");
-                return ResponseEntity.badRequest()
-                        .body(Map.of(
-                                "valid", false,
-                                "error", "Header Authorization inválido"
-                        ));
-            }
-
-            String token = authHeader.substring(7); // Remover "Bearer "
-
-            boolean isValid = authService.validateToken(token);
-
-            if (isValid) {
-                // Si es válido, extraer claims adicionales
-                Map<String, Object> claims = authService.extractTokenClaims(token);
-                claims.put("valid", true);
-
-                log.debug("Token válido para usuario: {}", claims.get("email"));
-                return ResponseEntity.ok(claims);
-            } else {
-                log.debug("Token inválido");
-                return ResponseEntity.ok(Map.of(
-                        "valid", false,
-                        "error", "Token inválido o expirado"
-                ));
-            }
-        } catch (Exception e) {
-            log.error("Error al validar token: {}", e.getMessage());
-            return ResponseEntity.ok(Map.of(
-                    "valid", false,
-                    "error", "Error interno al validar token"
-            ));
-        }
-    }
-
-    // getUserInfo - Obtener informacion del usuario
-    @Operation(
-            summary = "Obtener información de usuario desde token",
-            description = "Extrae información completa del usuario desde un token JWT válido."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Información extraída exitosamente"),
-            @ApiResponse(responseCode = "401", description = "Token inválido"),
-            @ApiResponse(responseCode = "400", description = "Token no proporcionado")
-    })
-    @GetMapping("/user-info")
-    public ResponseEntity<Map<String, Object>> getUserInfo(
-            @Parameter(description = "Token JWT en header Authorization: Bearer <token>", required = true)
-            @RequestHeader("Authorization") String authHeader) {
-
-        try {
-            // Validar header
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of("error", "Header Authorization inválido"));
-            }
-
-            String token = authHeader.substring(7);
-
-            Map<String, Object> userInfo = authService.getUserInfoFromToken(token);
-
-            if (userInfo.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(Map.of("error", "Token inválido o usuario no encontrado"));
-            }
-
-            log.debug("Información de usuario extraída para: {}", userInfo.get("email"));
-            return ResponseEntity.ok(userInfo);
-
-        } catch (Exception e) {
-            log.error("Error al obtener información de usuario: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Error interno del servidor"));
-        }
-    }
-
-    // validateRole - Validar si el usuario tiene un rol especifico
-    @Operation(
-            summary = "Validar rol de usuario",
-            description = "Verifica si el usuario autenticado tiene un rol específico."
-    )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Rol validado (ver response body)"),
-            @ApiResponse(responseCode = "400", description = "Parámetros inválidos"),
-            @ApiResponse(responseCode = "401", description = "Token inválido")
-    })
-    @GetMapping("/validate-role/{role}")
-    public ResponseEntity<Map<String, Object>> validateRole(
-            @Parameter(description = "Rol a validar (POSTULANTE, EMPRESA, ADMIN)", required = true)
-            @PathVariable String role,
-            @Parameter(description = "Token JWT en header Authorization: Bearer <token>", required = true)
-            @RequestHeader("Authorization") String authHeader) {
-
-        try {
-            // Validar header
-            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                return ResponseEntity.badRequest()
-                        .body(Map.of(
-                                "hasRole", false,
-                                "error", "Header Authorization inválido"
-                        ));
-            }
-
-            String token = authHeader.substring(7);
-
-            // Validar rol
-            boolean hasRole = authService.hasRole(token, role.toUpperCase());
-
-            Map<String, Object> response = Map.of(
-                    "hasRole", hasRole,
-                    "requiredRole", role.toUpperCase()
-            );
-
-            log.debug("Validación de rol {} para usuario: {}", role, hasRole ? "PERMITIDO" : "DENEGADO");
-            return ResponseEntity.ok(response);
-
-        } catch (Exception e) {
-            log.error("Error al validar rol: {}", e.getMessage());
-            return ResponseEntity.ok(Map.of(
-                    "hasRole", false,
-                    "error", "Error interno al validar rol"
-            ));
         }
     }
 }
