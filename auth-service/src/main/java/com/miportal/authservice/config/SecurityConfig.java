@@ -32,6 +32,7 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity // Permite @PreAuthorize encontroladores y servicios
+@Profile("!test")
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
