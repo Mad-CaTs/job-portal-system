@@ -13,7 +13,8 @@ public interface AuthMapper {
     @Mapping(target = "email", expression = "java(usuario.getEmail())")
     @Mapping(target = "rol", expression = "java(usuario.getRol().getNombre())")
     @Mapping(target = "accessToken", expression = "java(accessToken)")
-    LoginResponse toLoginResponse(Usuario usuario, String accessToken);
+    @Mapping(target = "refreshToken", expression = "java(refreshToken)")
+    LoginResponse toLoginResponse(Usuario usuario, String accessToken, String refreshToken);
 
     @Mapping(target = "authenticated", expression = "java(true)")
     @Mapping(target = "message", constant = "Autenticación exitosa")

@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Tag(name = "🔐 Autenticación", description = "Operaciones de autenticación y gestión de tokens JWT")
 public class AuthController {
+
     private final AuthService authService;
 
     // Login - Iniciar Sesion
@@ -44,15 +45,13 @@ public class AuthController {
 
         try {
             LoginResponse loginResponse = authService.login(request);
-            String refreshToken = authService.getLastRefreshToken();
 
-            // Crear cookie HttpOnly para refreshToken
-            ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+            ResponseCookie cookie = ResponseCookie.from("refreshToken", loginResponse.getRefreshToken())
                     .httpOnly(true)
-                    .secure(false)
+                    .secure(false)                      // true en HTTPS (prod), false en HTTP (dev)
                     .path("/")
                     .maxAge(3600)
-                    .sameSite("Lax")
+                    .sameSite("Lax")                    // Lax en dev, Strict en prod
                     .build();
 
             response.addHeader("Set-Cookie", cookie.toString());

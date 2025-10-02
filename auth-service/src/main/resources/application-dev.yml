@@ -27,6 +27,6 @@ spring:
     sql-migration-suffixes: .sql
 
 jwt:
-  secret: Y16Y9Kp3eX7Q53U9v1yph0K3NaiypABC
+  secret: ${JWT_SECRET:Y16Y9Kp3eX7Q53U9v1yph0K3NaiypABC}
   access-expiration-millis: 900000
   refresh-expiration-millis: 3600000
