@@ -1,5 +1,3 @@
-// src/app/models/auth.models.ts
-
 // Request para login
 export interface LoginRequest {
   email: string;
@@ -11,12 +9,13 @@ export interface RegisterRequest {
   username: string;
   email: string;
   password: string;
-  rol: string; // "POSTULANTE" o "EMPRESA"
+  rol: string; 
 }
 
 // Response del login
 export interface LoginResponse {
   accessToken: string;
+  refreshToken: string;
   username: string;
   email: string;
   rol: string;
